@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import { Route, Routes} from "react-dom";
+import { MantineProvider, Text } from "@mantine/core";
 
-function App() {
+import Navbar from "./Navbar";
+import Home from "./pages/Home";
+import Map from "./pages/Map";
+import Browser from "./pages/Browser";
+
+export default function App() {
+  const [savedItem, setSavedItem] = useState([]);
+
+  useEffect(() => {
+    
+  })
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <MantineProvider withGlobalStyles withNormalizeCSS>
+        <Navbar />
+        <Text>Mantine!</Text>
+      </MantineProvider>
+      <Routes>
+        <Route index path="/" element={<Home />} />
+        <Route path="/map" element={<Map />} />
+        <Route path="items" element={<Browser />} />
+      </Routes>
     </div>
+
   );
 }
-
-export default App;

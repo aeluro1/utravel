@@ -1,0 +1,32 @@
+name: Run Scrapers
+on:
+  workflow_dispatch
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repo
+        uses: actions/checkout@v3
+      - name: Setting up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      # - name: Listing installed package
+      #   run: apt list --installed
+      - name: Purging previous chromedriver installation
+        run: sudo apt purge google-chrome-stable
+      - name: Installing required packages
+        run: pip install -r requirements.txt
+        # run: pip install chromedriver-autoinstaller selenium
+      - name: Run scrapers
+        run: python src/scraper/scraper.py
+      - name: Commit and push results
+        run: |
+          git config --global user.name "github-action[bot]"
+          git config --global user.email "bot@users.noreply.github.com"
+          git add .
+          git commit -m "GitHub Action: Run Scrapers"
+          git push
+
+
+      

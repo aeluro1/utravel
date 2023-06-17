@@ -23,5 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # custom
+__pycache__
 /.vscode
 /venv

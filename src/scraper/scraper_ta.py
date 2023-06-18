@@ -6,7 +6,7 @@ import asyncio
 import random
 import string
 import math
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, field
 
 import httpx
 import requests
@@ -26,25 +26,25 @@ from scraper_se import SeleniumDriver
 
 @dataclass
 class Location:
-    name: str
-    url: str
-    food_url: str
-    fun_url: str
-    hotel_url: str
-    place_type: str
-    pos: tuple[float, float]
+    name: str = ""
+    url: str = ""
+    food_url: str = ""
+    fun_url: str = ""
+    hotel_url: str = ""
+    place_type: str = ""
+    pos: tuple[float, float] = (-1, -1)
     
     
 @dataclass
 class Restaurant:
-    name: str
-    url: str
-    rating: str
-    review_count: int
-    price: str
-    tags: list[str]
-    imgs: list[str]
-    contact: dict
+    name: str = ""
+    url: str = ""
+    rating: int = -1
+    review_count: int = -1
+    price: str = ""
+    tags: list[str] = field(default_factory = list)
+    imgs: list[str] = field(default_factory = list)
+    contact: dict = field(default_factory = dict)
 
 
 @wrap_except("Failed to scrape location summary")
@@ -132,14 +132,18 @@ async def request_loc(query: str, client: httpx.AsyncClient) -> Location:
     return loc
 
 @wrap_except("Could not request page")
-async def request_page(url: str, client: httpx.AsyncClient, tree: bool = False) -> str | etree._Element:
+async def request_page(url: str, client: httpx.AsyncClient) -> str:
     response = await client.get(url)
     response.raise_for_status()
-    html = response.text
-    return (etree.HTML(html, None) if tree else html)
+    return response.text
 
-@wrap_except("Could not parse page")
-def parse_search_page(tree: etree._Element) -> list[Restaurant]:
+@wrap_except("Could not request page")
+async def request_page_tree(url:str, client: httpx.AsyncClient) -> etree._Element:
+    html = await request_page(url, client)
+    return etree.HTML(html, None)
+
+@wrap_except("Could not parse search page")
+async def parse_search_page(tree: etree._Element) -> list[Restaurant]:
     items = []
     
     for elem in tree.xpath("//div[@data-test]"):
@@ -147,36 +151,62 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
         body = elem.xpath(".//span[string-length(text()) > 0]/text()")
         if body[0] == "Sponsored":
             continue
-        url = elem.xpath(".//a[contains(@href, 'Restaurant_Review') and string-length(text()) > 0]")[0]
-        name = url.xpath("text()")[-1]
-        url = url.xpath("@href")[0]
-        review_count = 0#int(body[0].replace(",",""))
-        tags = body[3].split(", ")
-        price = body[4]
-        rating = elem.xpath(".//svg/@aria-label")[0].split()[0]
+        url = elem.xpath(".//a[contains(@href, 'Restaurant_Review') and string-length(text()) > 0]/@href")[0]
         item = Restaurant(
-            name = name,
-            url = ta_url(url),
-            rating = rating,
-            review_count = review_count,
-            price = price,
-            tags = tags,
-            imgs = [],
-            contact = {}
+            url = ta_url(url)
         )
         
         items.append(item)
-        logger.info(f"Added restaurant: {name}")
         
-    logger.info(f"Collected all restaurants on page")        
+    logger.info(f"Collected all restaurants on page")
     return items
 
+@wrap_except("Could not scrape restaurant page")
+async def scrape_rst_page(rst: Restaurant, client: httpx.AsyncClient) -> Restaurant:
+    html = await request_page(rst.url, client)
+    data = get_page_data(html)["urqlCache"]["results"]
+    data_rst = find_nested_key(data, "RestaurantPresentation_searchRestaurantsByGeo")
+    data_rst = data_rst["RestaurantPresentation_searchRestaurantsByGeo"]["restaurants"][0]
 
-def get_page_data(html):
+    rst.name = data_rst["name"]
+    rst.rating = data_rst["reviewSummary"]["rating"]
+    rst.review_count = data_rst["reviewSummary"]["count"]
+    rst.price = data_rst["topTags"][0]["secondary_name"]
+    rst.tags = [tag["localizedName"] for tag in data_rst["topTags"]]
+    # rst.imgs
+    rst.contact = {
+        "address": data_rst["localizedRealtimeAddress"],
+        "telephone": data_rst["telephone"],
+    }
+    
+    # # Implementation for scraping reviews if ever desired
+    #
+    # tree = etree.HTML(html, None)
+    # data_rev = tree.xpath(".//div[contains(@class, 'review-container')]")
+    # num_rev_page = len(data_rev)
+    # num_rev_total = rst.review_count
+    # num_page_total = math.ceil(num_rev_total / num_rev_page)
+    # rev_urls = [rst.url.replace("-Reviews-", f"-Reviews-or{num_rev_page * i}-") for i in range(1, num_page_total)]
+    # rev_list = []
+    # responses = await asyncio.gather(*[request_page_tree(rev_url, client) for rev_url in rev_urls])
+    # for response in [tree, *responses]:
+    #     rev_list.extend(scrape_rev(response))
+    
+    return rst
+
+
+def get_page_data(html: str) -> dict:
     """Extract JS pageManifest object's state data from graphql hidden in HTML page
     """
     data = re.findall(r"{pageManifest:({.+?})};", html, re.DOTALL)[0]
     return json.loads(data)
+
+
+@wrap_except("Could not get parameter value")
+def find_nested_key(data: dict, target: str) -> dict:
+    results = [data[i]["data"] for i in data if target in data[i]["data"]][0]
+    results = json.loads(results)
+    return results
 
 
 async def scrape(locs: list[str] = [], num_pages_max: int | None = None):
@@ -184,9 +214,7 @@ async def scrape(locs: list[str] = [], num_pages_max: int | None = None):
         locs = get_locations()
     
     async with build_client() as client:
-        responses = []
-        for loc in locs:
-            responses.append(asyncio.ensure_future(request_loc(loc, client)))
+        responses = [asyncio.ensure_future(request_loc(loc, client)) for loc in locs]
         locs_data = await asyncio.gather(*responses)
         
         for loc_data in locs_data:
@@ -200,7 +228,7 @@ async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_m
     tree = etree.HTML(chrome.get(url, "//span[contains(text(), 'results')]"), None)
     chrome.close()
     
-    rst_list = parse_search_page(tree)
+    rst_list = await parse_search_page(tree)
     num_results_page = len(rst_list)
     num_results_total = int(tree.xpath("//span[contains(text(), 'results')]/span/text()")[0])
     num_pages_total = math.ceil(num_results_total / num_results_page)
@@ -212,13 +240,16 @@ async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_m
     next_page_url = ta_url(tree.xpath("//a[@data-page-number and contains(text(), 'Next')]/@href")[0])
     next_urls = [next_page_url.replace(f"oa{num_results_page}", f"oa{num_results_page * i}") for i in range(1, num_pages_total)]
     
-    next_pages_data = [asyncio.ensure_future(request_page(next_url, client, tree = True)) for next_url in next_urls]
+    next_pages_data = [asyncio.ensure_future(request_page_tree(next_url, client)) for next_url in next_urls]
     for next_page_data in asyncio.as_completed(next_pages_data):
-        rst_list.extend(parse_search_page(await next_page_data))
+        rst_list.extend(await parse_search_page(await next_page_data))
+        
+    await scrape_rst_page(rst_list[0], client)
     
     with open(f"{loc_data.name}", "w") as f:
         temp = [vars(i) for i in rst_list]
-        json.dump(temp, f, indent = 4)
+        print(temp)
+        # json.dump(temp, f, indent = 4)
     
 
 if __name__ == "__main__":

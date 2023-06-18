@@ -35,18 +35,18 @@ def get_locations():
     return names.tolist()
 
 
-def wrap_except(err_msg: str) -> Callable:
+def wrap_except(err_msg: str = "Default exception") -> Callable:
     """Creates customized decorator for some function for logging exceptions
     """
     def decorator(func: Callable) -> Callable:
-        def inner(*args: list, **kwargs: dict):
+        def inner(*args: list, **kwargs: dict) -> object:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
                 if len(args) != 0:
-                    logger.exception(err_msg.format(args[0], e))
+                    logger.exception(f"{err_msg}: {args[0]} - {e}")
                 else:
-                    logger.exception(f"Failed for unknown reason - {e}")
+                    logger.exception(f"{err_msg} - {e}")
                 return None      
         return inner
     return decorator

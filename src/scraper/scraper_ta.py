@@ -12,8 +12,8 @@ from pathlib import Path
 import aiometer
 from loguru import logger
 from lxml import etree
+from sqlalchemy.orm import Session
 
-from models import Restaurant, init_db
 from scraper_utils import (
     ScraperClient,
     wrap_except,
@@ -24,11 +24,10 @@ from scraper_utils import (
     is_file
 )
 from scraper_se import SeleniumDriver
-from models import Location, Restaurant
+from database import Location, Restaurant, engine, Session
 
 
 SAVE_PATH = Path(__file__).resolve().parent / "data"
-Session = init_db()
 
 
 @wrap_except("Failed to scrape location summary")
@@ -179,7 +178,7 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
         imgs = elem.xpath(".//div[contains(@style, 'background-image')]/@style")
         r = re.compile(r"url\(\"(.*?)\"\)")
         imgs = [re.findall(r, img)[0] for img in imgs]
-        item.imgs = imgs
+        item.imgs = json.dumps(imgs)
         
         items.append(item)
         
@@ -210,7 +209,7 @@ async def scrape_rst_page(client: ScraperClient, rst: Restaurant) -> Restaurant:
         rst.rating = data_rst["reviewSummary"]["rating"]
         rst.review_count = data_rst["reviewSummary"]["count"]
         # rst.imgs
-        rst.tags = [tag["tag"]["localizedName"] for tag in data_rst["topTags"]]
+        rst.tags = json.dumps([tag["tag"]["localizedName"] for tag in data_rst["topTags"]])
         rst.price = data_rst["topTags"][0]["secondary_name"]
     except Exception:
         pass
@@ -308,14 +307,14 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     if not is_file(fn.with_suffix(".json")):
         jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list_init]
         rst_list = await aiometer.run_all(jobs, max_at_once = 5, max_per_second = 1)
+        
         save_json(fn, rst_list)
+        with Session() as session:
+            session.add_all(rst_list)
+            session.commit()
     
         logger.info(f"[{loc_data.name}] Successfully scraped initial page")
-        # with Session() as session:
-        #     session.add_all(rst_list)
-        #     session.commit()
     page_count += 1
-    
 
     next_url = ta_url(tree.xpath("//a[@data-page-number and contains(text(), 'Next')]/@href")[0])
     next_urls = []
@@ -338,10 +337,9 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
         
         fn = SAVE_PATH / f"{loc_data.name} - {page_count + 1}"
         save_json(fn, rst_list)
-
-        # with Session() as session:
-        #     session.add_all(rst_list_temp)
-        #     session.commit()
+        with Session() as session:
+            session.add_all(rst_list)
+            session.commit()
           
         page_count += 1
         if page_count % 3 == 0:
@@ -354,4 +352,4 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
 
 if __name__ == "__main__":
     locs = get_locations()
-    asyncio.run(scrape(["Atlanta"], 3))
+    asyncio.run(scrape(["Atlanta"], 2))

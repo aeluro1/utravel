@@ -27,7 +27,7 @@ class SeleniumDriver:
     def get(self, url: str, wait: list[str] = []) -> str:
         self._driver.get(url)
         
-        wait_driver = WebDriverWait(self._driver, 30)
+        wait_driver = WebDriverWait(self._driver, 15)
         for w in wait:
             wait_driver.until(EC.presence_of_element_located((By.XPATH, w)))
         

@@ -25,7 +25,7 @@ def build_client() -> httpx.AsyncClient:
         # http2 = True,
         headers = headers,
         timeout = httpx.Timeout(10.0),
-        limits = httpx.Limits(max_connections = 5)
+        limits = httpx.Limits(max_connections = 8)
     )
     
     return client

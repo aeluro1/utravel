@@ -9,6 +9,7 @@ import math
 from dataclasses import dataclass, field
 
 import httpx
+import aiometer
 from loguru import logger
 from lxml import etree
 
@@ -190,7 +191,7 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
         )
         
         imgs = elem.xpath(".//div[contains(@style, 'background-image')]/@style")
-        r = re.compile(r"url\((.*?)\)")
+        r = re.compile(r"url\(\"(.*?)\"\)")
         imgs = [re.findall(r, img)[0] for img in imgs]
         item.imgs = imgs
         
@@ -299,12 +300,12 @@ async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_m
     url = getattr(loc_data, f"food_url")
     
     chrome = SeleniumDriver()
-    wait_list = ["//div[contains(text(), 'results')]", "//div[contains(@style, 'background-image')]"]
+    wait_list = ["//span[contains(text(), 'results')]", "//div[contains(@style, 'background-image')]"]
     tree = etree.HTML(chrome.get(url, wait_list), None)
     chrome.close()
     
     # Get total number of results to calculate number of pages
-    rst_list = [await scrape_rst_page(rst, client) for rst in parse_search_page(tree)]
+    rst_list = await asyncio.gather(*[scrape_rst_page(rst, client) for rst in parse_search_page(tree)])
     num_results_page = len(rst_list)
     num_results_total = int(tree.xpath("//span[contains(text(), 'results')]/span/text()")[0])
     num_pages_total = math.ceil(num_results_total / num_results_page)
@@ -315,19 +316,30 @@ async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_m
     next_url = ta_url(tree.xpath("//a[@data-page-number and contains(text(), 'Next')]/@href")[0])
     next_urls = [next_url.replace(f"oa{num_results_page}", f"oa{num_results_page * i}") for i in range(1, num_pages_max)]
     next_pages = [asyncio.ensure_future(request_page_tree(n, client)) for n in next_urls]
-    page_count = 0
+    page_count = 1
     for next_page_data in asyncio.as_completed(next_pages):
         rst_list_temp = parse_search_page(await next_page_data)
-        rst_list.extend([await scrape_rst_page(rst, client) for rst in rst_list_temp])
+        # jobs = [functools.partial(scrape_rst_page, rst, client) for rst in rst_list_temp]
+        # rst_list_temp = await aiometer.run_all(
+        #     scrape_rst_page,
+        #     (rst, client),
+        #     max_at_once = 5
+        #     max_per_second = 1
+        # )
+        responses = [asyncio.ensure_future(scrape_rst_page(rst, client)) for rst in rst_list_temp]
+        rst_list_temp = await asyncio.gather(*responses)
+        rst_list.extend(rst_list_temp)
+        
         page_count += 1
         logger.info(f"[{loc_data.name}] Successfully scraped {page_count}/{num_pages_max} pages")
     
     with open(f"{loc_data.name}.json", "w") as f:
         temp = [vars(i) for i in rst_list]
-        print(temp)
         json.dump(temp, f, indent = 4)
+    
+    logger.info(f"[{loc_data.name}] Location processed")
     
 
 if __name__ == "__main__":
     locs = get_locations()
-    asyncio.run(scrape(["Los Angeles"], 5))
+    asyncio.run(scrape(["Hong Kong"], 10))

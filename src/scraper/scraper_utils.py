@@ -1,8 +1,10 @@
 import pandas as pd
-import httpx
 from typing import Callable
 from pathlib import Path
 from pprint import pprint
+
+
+import httpx
 
 from loguru import logger
 from fake_useragent import UserAgent
@@ -29,12 +31,6 @@ def build_client() -> httpx.AsyncClient:
     return client
 
 
-def get_locations():
-    df = pd.read_csv(LOC_PATH)
-    names = df.iloc[1:,0]
-    return names.tolist()
-
-
 def wrap_except(err_msg: str = "Default exception") -> Callable:
     """Creates customized decorator for some function for logging exceptions
     """
@@ -55,6 +51,12 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
 def ta_url(url_stem):
     url_root = "https://www.tripadvisor.com"
     return url_root + url_stem
+
+
+def get_locations():
+    df = pd.read_csv(LOC_PATH)
+    names = df.iloc[1:,0]
+    return names.tolist()
 
 
 def main():

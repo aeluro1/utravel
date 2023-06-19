@@ -24,10 +24,13 @@ class SeleniumDriver:
 
         self._driver = webdriver.Chrome(options = chrome_options)
     
-    def get(self, url: str, wait: str = "") -> str:
+    def get(self, url: str, wait: list[str] = []) -> str:
         self._driver.get(url)
-        if not wait == "":
-            WebDriverWait(self._driver, 30).until(EC.presence_of_element_located((By.XPATH, wait)))
+        
+        wait_driver = WebDriverWait(self._driver, 30)
+        for w in wait:
+            wait_driver.until(EC.presence_of_element_located((By.XPATH, w)))
+        
         return self._driver.page_source
     
     def close(self):

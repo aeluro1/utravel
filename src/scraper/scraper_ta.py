@@ -6,15 +6,15 @@ import asyncio
 import random
 import string
 import math
+import functools
 from dataclasses import dataclass, field
 
-import httpx
 import aiometer
 from loguru import logger
 from lxml import etree
 
 from scraper_utils import (
-    build_client,
+    ScraperClient,
     wrap_except,
     ta_url,
     get_locations,
@@ -46,12 +46,12 @@ class Restaurant:
 
 
 @wrap_except("Failed to scrape location summary")
-async def request_loc(query: str, client: httpx.AsyncClient) -> Location:
+async def request_loc(query: str, client: ScraperClient) -> Location:
     """Clone a graphql request to obtain location details
 
     Args:
         query (str): Location
-        client (httpx.AsyncClient): HTTPX client
+        client (ScraperClient): HTTPX client
 
     Returns:
         Location: Location dataclass
@@ -138,12 +138,12 @@ async def request_loc(query: str, client: httpx.AsyncClient) -> Location:
 
 
 @wrap_except("Could not request page")
-async def request_page(url: str, client: httpx.AsyncClient) -> str:
+async def request_page(url: str, client: ScraperClient) -> str:
     """Request a page's HTML content
 
     Args:
         url (str): URL to request
-        client (httpx.AsyncClient): HTTPX client
+        client (ScraperClient): HTTPX client
 
     Returns:
         str: HTML as a string
@@ -154,12 +154,12 @@ async def request_page(url: str, client: httpx.AsyncClient) -> str:
 
 
 @wrap_except("Could not request page")
-async def request_page_tree(url:str, client: httpx.AsyncClient) -> etree._Element:
+async def request_page_tree(url:str, client: ScraperClient) -> etree._Element:
     """Request a page's HTML content as an XML tree
 
     Args:
         url (str): URL to request
-        client (httpx.AsyncClient): HTTPX client
+        client (ScraperClient): HTTPX client
 
     Returns:
         etree._Element: Root element of tree
@@ -201,12 +201,12 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
 
 
 @wrap_except("Could not scrape restaurant page")
-async def scrape_rst_page(rst: Restaurant, client: httpx.AsyncClient) -> Restaurant:
+async def scrape_rst_page(rst: Restaurant, client: ScraperClient) -> Restaurant:
     """Scrapes content of restaurant page
 
     Args:
         rst (Restaurant): Restaurant dataclass containing URL to parse
-        client (httpx.AsyncClient): _description_
+        client (ScraperClient): _description_
 
     Returns:
         Restaurant: Modified Restaurant dataclass
@@ -216,16 +216,20 @@ async def scrape_rst_page(rst: Restaurant, client: httpx.AsyncClient) -> Restaur
     data_rst = find_nested_key(data, "RestaurantPresentation_searchRestaurantsByGeo")
     data_rst = data_rst["RestaurantPresentation_searchRestaurantsByGeo"]["restaurants"][0]
 
-    rst.name = data_rst["name"]
-    rst.rating = data_rst["reviewSummary"]["rating"]
-    rst.review_count = data_rst["reviewSummary"]["count"]
-    rst.price = data_rst["topTags"][0]["secondary_name"]
-    rst.tags = [tag["tag"]["localizedName"] for tag in data_rst["topTags"]]
-    # rst.imgs
-    rst.contact = {
-        "address": data_rst["localizedRealtimeAddress"],
-        "telephone": data_rst["telephone"],
-    }
+    try:
+        rst.name = data_rst["name"]
+        rst.rating = data_rst["reviewSummary"]["rating"]
+        rst.review_count = data_rst["reviewSummary"]["count"]
+        # rst.imgs
+        rst.contact = {
+            "address": data_rst["localizedRealtimeAddress"],
+            "telephone": data_rst["telephone"],
+        }
+        rst.tags = [tag["tag"]["localizedName"] for tag in data_rst["topTags"]]
+        rst.price = data_rst["topTags"][0]["secondary_name"]
+    except Exception:
+        pass
+
     
     # # Implementation for scraping reviews if ever desired
     #
@@ -280,8 +284,8 @@ async def scrape(locs: list[str], num_pages_max: int = -1):
         locs (list[str], optional): _description_. Defaults to [].
         num_pages_max (int | None, optional): _description_. Defaults to None.
     """
-    
-    async with build_client() as client:
+    headers = {"Referer": "https://www.tripadvisor.com/"}
+    async with ScraperClient(headers) as client:
         responses = [asyncio.ensure_future(request_loc(loc, client)) for loc in locs]
         locs_data = await asyncio.gather(*responses)
         
@@ -289,12 +293,12 @@ async def scrape(locs: list[str], num_pages_max: int = -1):
             await scrape_food(loc_data, client, num_pages_max)
             
                 
-async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_max: int = -1):
+async def scrape_food(loc_data: Location, client: ScraperClient, num_pages_max: int = -1):
     """Scrapes all restaurants for a specified location generated from scrape()
 
     Args:
         loc_data (Location): Location dataclass
-        client (httpx.AsyncClient): HTTPX client
+        client (ScraperClient): HTTPX client
         num_pages_max (int | None, optional): Maximum number of pages to scrape. Defaults to None.
     """
     url = getattr(loc_data, f"food_url")
@@ -319,18 +323,23 @@ async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_m
     page_count = 1
     for next_page_data in asyncio.as_completed(next_pages):
         rst_list_temp = parse_search_page(await next_page_data)
-        # jobs = [functools.partial(scrape_rst_page, rst, client) for rst in rst_list_temp]
-        # rst_list_temp = await aiometer.run_all(
-        #     scrape_rst_page,
-        #     (rst, client),
-        #     max_at_once = 5
-        #     max_per_second = 1
-        # )
-        responses = [asyncio.ensure_future(scrape_rst_page(rst, client)) for rst in rst_list_temp]
-        rst_list_temp = await asyncio.gather(*responses)
+        
+        # Use aiometer to throttle connections to bypass bot checks
+        jobs = [functools.partial(scrape_rst_page, rst, client) for rst in rst_list_temp]
+        rst_list_temp = await aiometer.run_all(
+            jobs,
+            max_at_once = 5,
+            max_per_second = 1
+        )
+        
+        # responses = [asyncio.ensure_future(scrape_rst_page(rst, client)) for rst in rst_list_temp]
+        # rst_list_temp = await asyncio.gather(*responses)
         rst_list.extend(rst_list_temp)
         
         page_count += 1
+        if page_count % 3 == 0:
+            client.reset()
+        
         logger.info(f"[{loc_data.name}] Successfully scraped {page_count}/{num_pages_max} pages")
     
     with open(f"{loc_data.name}.json", "w") as f:
@@ -342,4 +351,4 @@ async def scrape_food(loc_data: Location, client: httpx.AsyncClient, num_pages_m
 
 if __name__ == "__main__":
     locs = get_locations()
-    asyncio.run(scrape(["Hong Kong"], 10))
+    asyncio.run(scrape(["Hong Kong"], 3))

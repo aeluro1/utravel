@@ -1,9 +1,10 @@
-import pandas as pd
+import hashlib
+import json
 from typing import Callable
 from pathlib import Path
 from pprint import pprint
 
-
+import pandas as pd
 import httpx
 
 from loguru import logger
@@ -63,6 +64,26 @@ def get_locations():
     df = pd.read_csv(LOC_PATH)
     names = df.iloc[1:,0]
     return names.tolist()
+
+
+def hash_str(key: str) -> str:
+    h = hashlib.sha256(key.encode("utf-8")).hexdigest()
+    h = int(h, 16) % (10**8)
+    return str(h)
+
+
+def save_json(fn: str | Path, data: list):
+    if isinstance(fn, str):
+        fn = Path(fn)
+    fn.parent.mkdir(parents = True, exist_ok = True)
+    with open(fn.with_suffix(".json"), "w") as f:
+        temp = [dict(filter(lambda i: not i[0].startswith("_"), vars(i).items())) for i in data]        
+        json.dump(temp, f, indent = 4)
+        
+def is_file(fn: str | Path) -> bool:
+    if isinstance(fn, str):
+        fn = Path(fn)
+    return fn.is_file()
 
 
 def main():

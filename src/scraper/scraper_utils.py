@@ -117,10 +117,10 @@ def save_json(fn: str | Path, data: list):
         
 
 def save_all(file: Path, rst_list: list[Restaurant]):
-    save_json(file, rst_list)
     with Session() as session:
         session.add_all(rst_list)
         session.commit()
+    save_json(file, rst_list)
         
 
 def is_file(fn: str | Path) -> bool:

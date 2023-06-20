@@ -7,8 +7,9 @@ import random
 import string
 import math
 import functools
+import argparse
 from pathlib import Path
-from argparse import ArgumentParser
+from pprint import pprint
 
 import aiometer
 from loguru import logger
@@ -28,7 +29,7 @@ from scraper_se import SeleniumDriver
 from database import Location, Restaurant
 
 
-MAX_PAGES = 3 # Set to -1 for all pages
+MAX_PAGES = 5 # Set to -1 for all pages
 MAX_CONN_AT_ONCE = 5
 MAX_CONN_PER_SEC = 1
 SAVE_PATH = Path(__file__).resolve().parent / "data"
@@ -335,17 +336,32 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     chrome.close()
 
 
-def main(args):
+def main(args: argparse.Namespace):
     locs = load_locations(args.csv)
-    asyncio.run(scrape(locs, MAX_PAGES))
+    if args.read:
+        pprint(locs)
+        exit()
+    asyncio.run(scrape(locs, args.num))
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description = "TripAdvisor Scraper")
+    parser = argparse.ArgumentParser(description = "TripAdvisor Scraper")
     parser.add_argument(
         "--csv",
         action = "store",
         help = "CSV file containing locations to scrape"
+    )
+    parser.add_argument(
+        "--num", "-n",
+        action = "store",
+        help = "number of search pages to scrape",
+        type = int,
+        default = MAX_PAGES
+    )
+    parser.add_argument(
+        "--read", "-r",
+        action = "store_true",
+        help = "print out the list of locations in a CSV"
     )
     args = parser.parse_args()
     

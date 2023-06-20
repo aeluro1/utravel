@@ -8,6 +8,7 @@ import string
 import math
 import functools
 from pathlib import Path
+from argparse import ArgumentParser
 
 import aiometer
 from loguru import logger
@@ -17,7 +18,7 @@ from scraper_utils import (
     ScraperClient,
     wrap_except,
     ta_url,
-    get_locations,
+    load_locations,
     find_nested_key,
     hash_str_array,
     save_all,
@@ -27,9 +28,10 @@ from scraper_se import SeleniumDriver
 from database import Location, Restaurant
 
 
-SAVE_PATH = Path(__file__).resolve().parent / "data"
+MAX_PAGES = 3 # Set to -1 for all pages
 MAX_CONN_AT_ONCE = 5
 MAX_CONN_PER_SEC = 1
+SAVE_PATH = Path(__file__).resolve().parent / "data"
 
 
 @wrap_except("Failed to scrape location summary")
@@ -256,7 +258,7 @@ def get_page_data(html: str) -> dict:
     return json.loads(data)
 
 
-async def scrape(locs: list[str], num_pages_max: int = -1):
+async def scrape(locs: list[str], num_pages_max: int = MAX_PAGES):
     """Scrapes a location summary - entry point for specific type scraping
 
     Args:
@@ -272,7 +274,7 @@ async def scrape(locs: list[str], num_pages_max: int = -1):
             await scrape_food(client, loc_data, num_pages_max)
             
                 
-async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: int = -1):
+async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: int = MAX_PAGES):
     """Scrapes all restaurants for a specified location generated from scrape()
 
     Args:
@@ -333,6 +335,18 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     chrome.close()
 
 
+def main(args):
+    locs = load_locations(args.csv)
+    asyncio.run(scrape(locs, MAX_PAGES))
+
+
 if __name__ == "__main__":
-    locs = get_locations()
-    asyncio.run(scrape(["Los Angeles", "Atlanta", "New York"], 3))
+    parser = ArgumentParser(description = "TripAdvisor Scraper")
+    parser.add_argument(
+        "--csv",
+        action = "store",
+        help = "CSV file containing locations to scrape"
+    )
+    args = parser.parse_args()
+    
+    main(args)

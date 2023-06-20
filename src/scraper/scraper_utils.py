@@ -16,7 +16,6 @@ from database import Restaurant, Session
 
 
 RETRY_WAIT_TIME = 15
-LOC_PATH = Path(__file__).parent / "locations.csv"
 
 
 class ScraperClient(httpx.AsyncClient):
@@ -59,7 +58,7 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
                     else:
                         logger.error(f"{err_msg} - {e}")
                     attempts += 1
-                    logger.exception(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s")
+                    logger.error(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s")
                     sleep(RETRY_WAIT_TIME)
         if not iscoroutinefunction(func):
             sync_func = func
@@ -130,7 +129,9 @@ def is_file(fn: str | Path) -> bool:
     return fn.is_file()
         
 
-def get_locations():
-    df = pd.read_csv(LOC_PATH)
+def load_locations(fn: str):
+    file = Path(__file__).parent / fn
+    file = file.with_suffix(".csv")
+    df = pd.read_csv(file)
     names = df.iloc[1:,0]
     return names.tolist()

@@ -1,5 +1,6 @@
 import hashlib
 import json
+from time import sleep
 from typing import Callable
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from fake_useragent import UserAgent
 from database import Restaurant, Session
 
 
+RETRY_WAIT_TIME = 15
 LOC_PATH = Path(__file__).parent / "locations.csv"
 
 
@@ -44,14 +46,18 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
     """
     def decorator(func: Callable) -> Callable:
         def inner(*args: list, **kwargs: dict) -> object:
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                if len(args) != 0:
-                    logger.exception(f"{err_msg}: {args[0]} - {e}")
-                else:
-                    logger.exception(f"{err_msg} - {e}")
-                return None      
+            while True:
+                attempts = 0
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if len(args) != 0:
+                        logger.exception(f"{err_msg}: {args[0]} - {e}")
+                    else:
+                        logger.exception(f"{err_msg} - {e}")
+                    attempts += 1
+                    logger.exception(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s")
+                    sleep(RETRY_WAIT_TIME)
         return inner
     return decorator
 

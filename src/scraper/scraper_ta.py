@@ -169,8 +169,7 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
     
     for elem in tree.xpath("//div[@data-test]"):
         # Gather required info using xpath
-        body = elem.xpath(".//span[string-length(text()) > 0]/text()")
-        if body[0] == "Sponsored":
+        if elem.xpath("@data-test")[0] == "SL_list_item":
             continue
         url = elem.xpath(".//a[contains(@href, 'Restaurant_Review') and string-length(text()) > 0]/@href")[0]
         item = Restaurant(
@@ -336,4 +335,4 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
 
 if __name__ == "__main__":
     locs = get_locations()
-    asyncio.run(scrape(["Los Angeles"], 3))
+    asyncio.run(scrape(["Los Angeles", "Atlanta", "New York"], 3))

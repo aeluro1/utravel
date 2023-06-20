@@ -7,3 +7,4 @@ httpx[http2,brotli]==0.24.1
 loguru==0.7.0
 aiometer==0.4.0
 sqlalchemy==2.0.16
+nest-asyncio==1.5.6

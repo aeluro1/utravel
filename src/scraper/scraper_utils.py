@@ -1,9 +1,10 @@
 import hashlib
 import json
+import asyncio
+import nest_asyncio
 from time import sleep
 from typing import Callable
 from pathlib import Path
-from asyncio import get_event_loop
 from inspect import iscoroutinefunction
 
 import pandas as pd
@@ -66,7 +67,8 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
                 return sync_func(*args, **kwargs)
             func = async_func
             def sync_inner(*args: list, **kwargs: dict) -> object:
-                loop = get_event_loop()
+                nest_asyncio.apply()
+                loop = asyncio.get_running_loop()
                 return loop.run_until_complete(inner(*args, **kwargs))
             return sync_inner
         else:

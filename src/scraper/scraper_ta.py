@@ -290,10 +290,8 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     chrome = SeleniumDriver()
     wait_list = ["//span[contains(text(), 'results')]", "//div[contains(@style, 'background-image')]"]
     tree = etree.HTML(chrome.get(url, wait_list), None)
-    chrome.close()
     
     # Get total number of results to calculate number of pages
-    # rst_list = await asyncio.gather(*[scrape_rst_page(client, rst) for rst in parse_search_page(tree)])
     rst_list_init = parse_search_page(tree)
     num_results_page = len(rst_list_init)
     num_results_total = int(tree.xpath("//span[contains(text(), 'results')]/span/text()")[0])
@@ -307,6 +305,7 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     if not is_file(fn.with_suffix(".json")):
         jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list_init]
         rst_list = await aiometer.run_all(jobs, max_at_once = 5, max_per_second = 1)
+        # rst_list = await asyncio.gather(*[scrape_rst_page(client, rst) for rst in parse_search_page(tree)]) # Too fast
         
         save_json(fn, rst_list)
         with Session() as session:
@@ -326,9 +325,10 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
             next_urls.append(next_url.replace(f"oa{num_results_page}", f"oa{num_results_page * i}"))
     logger.info(f"[{loc_data.name}] Starting process at page {page_count + 1}/{num_pages_max}")
     
-    # next_pages = [asyncio.ensure_future(request_page_tree(client, n)) for n in next_urls]
+    # next_pages = [asyncio.ensure_future(request_page_tree(client, n)) for n in next_urls] # Asynchronously iterate through pages
     # for next_page_data in asyncio.as_completed(next_pages):
-    for next_page_data in [await request_page_tree(client, n) for n in next_urls]:
+    # for next_page_data in [await request_page_tree(client, n) for n in next_urls]: # Synchronously iterate through pages
+    for next_page_data in [etree.HTML(chrome.get(n, wait_list), None) for n in next_urls]: # Synchronously iterate using Selenium
         rst_list_temp = parse_search_page(next_page_data)
         
         # Use aiometer to throttle connections to bypass bot checks
@@ -348,6 +348,8 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
         logger.info(f"[{loc_data.name}] Successfully scraped {page_count}/{num_pages_max} pages")
 
     logger.info(f"[{loc_data.name}] Location processed")
+    
+    chrome.close()
 
 
 if __name__ == "__main__":

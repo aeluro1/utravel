@@ -2,13 +2,14 @@ import hashlib
 import json
 from typing import Callable
 from pathlib import Path
-from pprint import pprint
 
 import pandas as pd
 import httpx
-
 from loguru import logger
 from fake_useragent import UserAgent
+
+from database import Restaurant, Session
+
 
 LOC_PATH = Path(__file__).parent / "locations.csv"
 
@@ -60,16 +61,31 @@ def ta_url(url_stem):
     return url_root + url_stem
 
 
-def get_locations():
-    df = pd.read_csv(LOC_PATH)
-    names = df.iloc[1:,0]
-    return names.tolist()
+@wrap_except("Could not get parameter value")
+def find_nested_key(data: dict, target: str) -> dict:
+    """Extracts specific key from nested JS state dictionary
+
+    Args:
+        data (dict): Dictionary representing JS state
+        target (str): Target key
+
+    Returns:
+        dict: Dictionary corresponding to target key
+    """
+    results = [data[i]["data"] for i in data if target in data[i]["data"]][0]
+    results = json.loads(results)
+    return results
 
 
 def hash_str(key: str) -> str:
     h = hashlib.sha256(key.encode("utf-8")).hexdigest()
     h = int(h, 16) % (10**8)
     return str(h)
+
+
+def hash_str_array(keys: list[str]) -> str:
+    h = "".join([hash_str(key) for key in keys])
+    return h
 
 
 def save_json(fn: str | Path, data: list):
@@ -80,18 +96,21 @@ def save_json(fn: str | Path, data: list):
         temp = [dict(filter(lambda i: not i[0].startswith("_"), vars(i).items())) for i in data]        
         json.dump(temp, f, indent = 4)
         
+
+def save_all(file: Path, rst_list: list[Restaurant]):
+    save_json(file, rst_list)
+    with Session() as session:
+        session.add_all(rst_list)
+        session.commit()
+        
+
 def is_file(fn: str | Path) -> bool:
     if isinstance(fn, str):
         fn = Path(fn)
     return fn.is_file()
+        
 
-
-def main():
-    locs = get_locations()
-    pprint(locs)
-
-
-if __name__ == "__main__":
-    main()
-    
-
+def get_locations():
+    df = pd.read_csv(LOC_PATH)
+    names = df.iloc[1:,0]
+    return names.tolist()

@@ -1,12 +1,12 @@
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from sqlalchemy import String, create_engine, Engine
+from sqlalchemy import String, create_engine
 from sqlalchemy.orm import (
     DeclarativeBase,
+    sessionmaker,
     Mapped,
-    mapped_column,
-    sessionmaker
+    mapped_column
 )
 
 

@@ -12,22 +12,24 @@ from pathlib import Path
 import aiometer
 from loguru import logger
 from lxml import etree
-from sqlalchemy.orm import Session
 
 from scraper_utils import (
     ScraperClient,
     wrap_except,
     ta_url,
     get_locations,
-    hash_str,
-    save_json,
+    find_nested_key,
+    hash_str_array,
+    save_all,
     is_file
 )
 from scraper_se import SeleniumDriver
-from database import Location, Restaurant, engine, Session
+from database import Location, Restaurant
 
 
 SAVE_PATH = Path(__file__).resolve().parent / "data"
+MAX_CONN_AT_ONCE = 5
+MAX_CONN_PER_SEC = 1
 
 
 @wrap_except("Failed to scrape location summary")
@@ -185,6 +187,16 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
     return items
 
 
+@wrap_except("Could not scrape search page")
+async def scrape_search_page(client: ScraperClient, rst_list: list[Restaurant]) -> list[Restaurant]:
+    # Use aiometer to throttle connections to bypass bot checks
+    # rst_list = await asyncio.gather(*[scrape_rst_page(client, rst) for rst in parse_search_page(tree)]) # Too fast
+    jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list]
+    rst_list = await aiometer.run_all(jobs, max_at_once = MAX_CONN_AT_ONCE, max_per_second = MAX_CONN_PER_SEC)
+    
+    return rst_list
+
+
 @wrap_except("Could not scrape restaurant page")
 async def scrape_rst_page(client: ScraperClient, rst: Restaurant) -> Restaurant:
     """Scrapes content of restaurant page
@@ -205,7 +217,7 @@ async def scrape_rst_page(client: ScraperClient, rst: Restaurant) -> Restaurant:
         rst.name = data_rst["name"]
         rst.address = data_rst["localizedRealtimeAddress"]
         rst.phone = data_rst["telephone"]
-        rst.id = hash_str(rst.address) # type: ignore
+        rst.id = hash_str_array([rst.address, rst.name]) # type: ignore
         rst.rating = data_rst["reviewSummary"]["rating"]
         rst.review_count = data_rst["reviewSummary"]["count"]
         # rst.imgs
@@ -243,22 +255,6 @@ def get_page_data(html: str) -> dict:
     """
     data = re.findall(r"{pageManifest:({.+?})};", html, re.DOTALL)[0]
     return json.loads(data)
-
-
-@wrap_except("Could not get parameter value")
-def find_nested_key(data: dict, target: str) -> dict:
-    """Extracts specific key from nested JS state dictionary
-
-    Args:
-        data (dict): Dictionary representing JS state
-        target (str): Target key
-
-    Returns:
-        dict: Dictionary corresponding to target key
-    """
-    results = [data[i]["data"] for i in data if target in data[i]["data"]][0]
-    results = json.loads(results)
-    return results
 
 
 async def scrape(locs: list[str], num_pages_max: int = -1):
@@ -301,18 +297,12 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     logger.info(f"[{loc_data.name}] Scraping {num_pages_max}/{num_pages_total} pages")
     page_count = 0
     
+    # Process first page
     fn = SAVE_PATH / f"{loc_data.name} - {page_count + 1}"
     if not is_file(fn.with_suffix(".json")):
-        jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list_init]
-        rst_list = await aiometer.run_all(jobs, max_at_once = 5, max_per_second = 1)
-        # rst_list = await asyncio.gather(*[scrape_rst_page(client, rst) for rst in parse_search_page(tree)]) # Too fast
-        
-        save_json(fn, rst_list)
-        with Session() as session:
-            session.add_all(rst_list)
-            session.commit()
-    
-        logger.info(f"[{loc_data.name}] Successfully scraped initial page")
+        rst_list = await scrape_search_page(client, rst_list_init)
+        save_all(fn, rst_list)
+        logger.info(f"[{loc_data.name}] First page scraped")
     page_count += 1
 
     next_url = ta_url(tree.xpath("//a[@data-page-number and contains(text(), 'Next')]/@href")[0])
@@ -328,19 +318,11 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
     # next_pages = [asyncio.ensure_future(request_page_tree(client, n)) for n in next_urls] # Asynchronously iterate through pages
     # for next_page_data in asyncio.as_completed(next_pages):
     # for next_page_data in [await request_page_tree(client, n) for n in next_urls]: # Synchronously iterate through pages
-    for next_page_data in [etree.HTML(chrome.get(n, wait_list), None) for n in next_urls]: # Synchronously iterate using Selenium
-        rst_list_temp = parse_search_page(next_page_data)
-        
-        # Use aiometer to throttle connections to bypass bot checks
-        jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list_temp]
-        rst_list = await aiometer.run_all(jobs, max_at_once = 5, max_per_second = 1)
-        
+    for next_url in next_urls: # Synchronously lazily iterate using Selenium
         fn = SAVE_PATH / f"{loc_data.name} - {page_count + 1}"
-        save_json(fn, rst_list)
-        with Session() as session:
-            session.add_all(rst_list)
-            session.commit()
-          
+        rst_list_temp = parse_search_page(etree.HTML(chrome.get(next_url, wait_list), None))
+        rst_list = await scrape_search_page(client, rst_list_temp)
+        save_all(fn, rst_list)
         page_count += 1
         if page_count % 3 == 0:
             client.reset()
@@ -354,4 +336,4 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
 
 if __name__ == "__main__":
     locs = get_locations()
-    asyncio.run(scrape(["Atlanta"], 2))
+    asyncio.run(scrape(["Los Angeles"], 3))

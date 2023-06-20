@@ -349,7 +349,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--csv",
         action = "store",
-        help = "CSV file containing locations to scrape"
+        help = "CSV file containing locations to scrape",
+        required = True
     )
     parser.add_argument(
         "--num", "-n",

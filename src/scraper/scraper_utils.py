@@ -133,5 +133,5 @@ def load_locations(fn: str):
     file = Path(__file__).parent / fn
     file = file.with_suffix(".csv")
     df = pd.read_csv(file)
-    names = df.iloc[1:,0]
+    names = df.iloc[:,0]
     return names.tolist()

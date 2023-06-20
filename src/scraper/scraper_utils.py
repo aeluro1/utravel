@@ -3,6 +3,8 @@ import json
 from time import sleep
 from typing import Callable
 from pathlib import Path
+from asyncio import get_event_loop
+from inspect import iscoroutinefunction
 
 import pandas as pd
 import httpx
@@ -36,7 +38,7 @@ class ScraperClient(httpx.AsyncClient):
 
 
 def wrap_except(err_msg: str = "Default exception") -> Callable:
-    """Creates customized decorator for some function for logging exceptions
+    """Creates customized decorator for sync/async function for logging exceptions and re-running
 
     Args:
         err_msg (str, optional): Exception message description. Defaults to "Default exception".
@@ -45,20 +47,30 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
         Callable: Customized decorator with message embedded
     """
     def decorator(func: Callable) -> Callable:
-        def inner(*args: list, **kwargs: dict) -> object:
+        async def inner(*args: list, **kwargs: dict) -> object:
+            attempts = 0
             while True:
-                attempts = 0
                 try:
-                    return func(*args, **kwargs)
+                    return await func(*args, **kwargs)
                 except Exception as e:
                     if len(args) != 0:
-                        logger.exception(f"{err_msg}: {args[0]} - {e}")
+                        logger.error(f"{err_msg}: {args[0]} - {e}")
                     else:
-                        logger.exception(f"{err_msg} - {e}")
+                        logger.error(f"{err_msg} - {e}")
                     attempts += 1
                     logger.exception(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s")
                     sleep(RETRY_WAIT_TIME)
-        return inner
+        if not iscoroutinefunction(func):
+            sync_func = func
+            async def async_func(*args, **kwargs):
+                return sync_func(*args, **kwargs)
+            func = async_func
+            def sync_inner(*args: list, **kwargs: dict) -> object:
+                loop = get_event_loop()
+                return loop.run_until_complete(inner(*args, **kwargs))
+            return sync_inner
+        else:
+            return inner
     return decorator
 
 

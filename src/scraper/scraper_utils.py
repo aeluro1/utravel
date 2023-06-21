@@ -16,13 +16,15 @@ from database import Restaurant, Session
 
 
 RETRY_WAIT_TIME = 15
+MAX_CONNECTIONS = 5
+TIMEOUT = 10
 
 
 class ScraperClient(httpx.AsyncClient):
     def __init__(self, headers = {}):
         super().__init__(
-            timeout = httpx.Timeout(10.0),
-            limits = httpx.Limits(max_connections = 5)
+            timeout = httpx.Timeout(TIMEOUT),
+            limits = httpx.Limits(max_connections = MAX_CONNECTIONS)
         )
         self.headers = {
             "Authority": "www.tripadvisor.com",

@@ -192,9 +192,9 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
 @wrap_except("Could not scrape search page")
 async def scrape_search_page(client: ScraperClient, rst_list: list[Restaurant]) -> list[Restaurant]:
     # Use aiometer to throttle connections to bypass bot checks
-    # rst_list = await asyncio.gather(*[scrape_rst_page(client, rst) for rst in parse_search_page(tree)]) # Too fast
-    jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list]
-    rst_list = await aiometer.run_all(jobs, max_at_once = MAX_CONN_AT_ONCE, max_per_second = MAX_CONN_PER_SEC)
+    rst_list = await asyncio.gather(*[scrape_rst_page(client, rst) for rst in rst_list]) # Too fast
+    # jobs = [functools.partial(scrape_rst_page, client, rst) for rst in rst_list]
+    # rst_list = await aiometer.run_all(jobs, max_at_once = MAX_CONN_AT_ONCE, max_per_second = MAX_CONN_PER_SEC)
     
     return rst_list
 

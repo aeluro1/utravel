@@ -23,6 +23,7 @@ TIMEOUT = 10
 class ScraperClient(httpx.AsyncClient):
     def __init__(self, headers = {}):
         super().__init__(
+            http2 = True,
             timeout = httpx.Timeout(TIMEOUT),
             limits = httpx.Limits(max_connections = MAX_CONNECTIONS)
         )

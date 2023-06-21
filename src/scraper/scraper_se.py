@@ -8,7 +8,7 @@ import chromedriver_autoinstaller
 
 
 TIMEOUT = 5
-NUM_RETRIES = 5
+MAX_RETRIES = 5
 
 
 class SeleniumDriver:
@@ -31,13 +31,13 @@ class SeleniumDriver:
     def get(self, url: str, wait: list[str] = []) -> str:
         self._driver.get(url)
         wait_driver = WebDriverWait(self._driver, TIMEOUT)
-        for _ in range(NUM_RETRIES):
+        for i in range(MAX_RETRIES + 1):
             try:
                 for w in wait:
                     wait_driver.until(EC.presence_of_element_located((By.XPATH, w)))
                 break
             except TimeoutException:
-                logger.error(f"Selenium driver timed out for {url}... retrying")
+                logger.error(f"Selenium driver timed out for {url}... retrying ({i + 1}/{MAX_RETRIES})")
                 self._driver.refresh()
         return self._driver.page_source
     

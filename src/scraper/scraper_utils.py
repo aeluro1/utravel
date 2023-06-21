@@ -17,7 +17,8 @@ from database import Restaurant, Session
 
 RETRY_WAIT_TIME = 15
 MAX_CONNECTIONS = 5
-TIMEOUT = 10
+TIMEOUT = 5
+MAX_RETRIES = 5
 
 
 class ScraperClient(httpx.AsyncClient):
@@ -52,14 +53,14 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
     def decorator(func: Callable) -> Callable:
         async def inner(*args: list, **kwargs: dict) -> object:
             attempts = 0
-            while True:
+            for i in range(MAX_RETRIES + 1):
                 try:
                     return await func(*args, **kwargs)
                 except Exception as e:
                     attempts += 1
                     caller_func = inspect.currentframe().f_back.f_code.co_name # type: ignore
                     logger.error(f"{err_msg} @ {caller_func}: {e}")
-                    logger.error(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s")
+                    logger.error(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s ({i + 1}/{MAX_RETRIES})")
                     sleep(RETRY_WAIT_TIME)
         if not inspect.iscoroutinefunction(func):
             sync_func = func

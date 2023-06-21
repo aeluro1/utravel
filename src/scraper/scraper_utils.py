@@ -2,10 +2,10 @@ import hashlib
 import json
 import asyncio
 import nest_asyncio
+import inspect
 from time import sleep
 from typing import Callable
 from pathlib import Path
-from inspect import iscoroutinefunction
 
 import pandas as pd
 import httpx
@@ -53,14 +53,12 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
                 try:
                     return await func(*args, **kwargs)
                 except Exception as e:
-                    if len(args) != 0:
-                        logger.error(f"{err_msg}: {args[0]} - {e}")
-                    else:
-                        logger.error(f"{err_msg} - {e}")
                     attempts += 1
+                    caller_func = inspect.currentframe().f_back.f_code.co_name # type: ignore
+                    logger.error(f"{err_msg} @ {caller_func}: {e}")
                     logger.error(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s")
                     sleep(RETRY_WAIT_TIME)
-        if not iscoroutinefunction(func):
+        if not inspect.iscoroutinefunction(func):
             sync_func = func
             async def async_func(*args, **kwargs):
                 return sync_func(*args, **kwargs)
@@ -107,20 +105,24 @@ def hash_str_array(keys: list[str]) -> str:
     return h
 
 
-def save_json(fn: str | Path, data: list):
-    if isinstance(fn, str):
-        fn = Path(fn)
-    fn.parent.mkdir(parents = True, exist_ok = True)
-    with open(fn.with_suffix(".json"), "w") as f:
+def save_json(file: str | Path, data: list):
+    if isinstance(file, str):
+        file = Path(file)
+    file.parent.mkdir(parents = True, exist_ok = True)
+    with open(file.with_suffix(".json"), "w") as f:
         temp = [dict(filter(lambda i: not i[0].startswith("_"), vars(i).items())) for i in data]        
         json.dump(temp, f, indent = 4)
         
 
 def save_all(file: Path, rst_list: list[Restaurant]):
-    with Session() as session:
-        session.add_all(rst_list)
-        session.commit()
     save_json(file, rst_list)
+    try:
+        with Session() as session:
+            session.add_all(rst_list)
+            session.commit()
+    except Exception as e:
+        file.with_suffix(".json").unlink(missing_ok = True)
+        logger.exception(f"Failed to save to database - {e}")
         
 
 def is_file(fn: str | Path) -> bool:

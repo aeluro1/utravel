@@ -33,6 +33,7 @@ MAX_PAGES = 5 # Set to -1 for all pages
 MAX_CONN_AT_ONCE = 5
 MAX_CONN_PER_SEC = 1
 SAVE_PATH = Path(__file__).resolve().parent / "data"
+CSV_PATH = Path(__file__).resolve().parent / "csv"
 
 
 @wrap_except("Failed to scrape location summary")
@@ -340,7 +341,8 @@ async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: 
 
 
 def main(args: argparse.Namespace):
-    locs = load_locations(args.csv)
+    csv_file = CSV_PATH / args.csv
+    locs = load_locations(csv_file)
     if args.read:
         pprint(locs)
         exit()

@@ -117,26 +117,29 @@ def save_json(file: str | Path, data: list):
         json.dump(temp, f, indent = 4)
         
 
-def save_all(file: Path, rst_list: list[Restaurant]):
+def save_all(file: str | Path, rst_list: list[Restaurant]):
+    if isinstance(file, str):
+        file = Path(file)
+    file = file.with_suffix(".json")
     save_json(file, rst_list)
     try:
         with Session() as session:
             session.add_all(rst_list)
             session.commit()
     except Exception as e:
-        file.with_suffix(".json").unlink(missing_ok = True)
+        file.unlink(missing_ok = True)
         logger.exception(f"Failed to save to database - {e}")
         
 
-def is_file(fn: str | Path) -> bool:
-    if isinstance(fn, str):
-        fn = Path(fn)
-    return fn.is_file()
+def is_file(file: str | Path) -> bool:
+    if isinstance(file, str):
+        file = Path(file)
+    return file.is_file()
         
 
-def load_locations(fn: str):
-    file = Path(__file__).parent / fn
-    file = file.with_suffix(".csv")
-    df = pd.read_csv(file)
+def load_locations(file: str | Path) -> list[str]:
+    if isinstance(file, str):
+        file = Path(file)
+    df = pd.read_csv(file.with_suffix(".csv"))
     names = df.iloc[:,0]
     return names.tolist()

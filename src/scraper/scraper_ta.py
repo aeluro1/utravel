@@ -272,7 +272,10 @@ async def scrape(locs: list[str], num_pages_max: int = MAX_PAGES):
         locs_data = await asyncio.gather(*responses)
         
         for loc_data in locs_data:
-            await scrape_food(client, loc_data, num_pages_max)
+            try:
+                await scrape_food(client, loc_data, num_pages_max)
+            except Exception as e:
+                logger.error(f"[{loc_data.name}] Could not process location - {e}")
             
                 
 async def scrape_food(client: ScraperClient, loc_data: Location, num_pages_max: int = MAX_PAGES):

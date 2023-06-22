@@ -61,7 +61,7 @@ def wrap_except(err_msg: str = "Default exception") -> Callable:
                     caller_func = inspect.currentframe().f_back.f_code.co_name # type: ignore
                     logger.error(f"{err_msg} @ {caller_func}: {e}")
                     logger.error(f"{attempts} attempt(s) made - retrying after {RETRY_WAIT_TIME}s ({i + 1}/{MAX_RETRIES})")
-                    sleep(RETRY_WAIT_TIME)
+                    await asyncio.sleep(RETRY_WAIT_TIME)
         if not inspect.iscoroutinefunction(func):
             sync_func = func
             async def async_func(*args, **kwargs):

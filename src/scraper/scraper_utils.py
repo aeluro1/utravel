@@ -1,7 +1,6 @@
 import hashlib
 import json
 import asyncio
-import nest_asyncio
 import inspect
 from time import sleep
 from typing import Callable
@@ -9,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import httpx
+import nest_asyncio
 from loguru import logger
 from fake_useragent import UserAgent
 

@@ -1,31 +1,29 @@
-import { useState, useEffect } from "react";
-import { Route, Routes} from "react-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Routes} from "react-router-dom";
 import { MantineProvider, Text } from "@mantine/core";
 
-import Navbar from "./Navbar";
+import Layout from "./pages/Layout";
 import Home from "./pages/Home";
-import Map from "./pages/Map";
 import Browser from "./pages/Browser";
+import NoPage from "./pages/NoPage"
 
 export default function App() {
-  const [savedItem, setSavedItem] = useState([]);
+  // const [savedItem, setSavedItem] = useState([]);
 
-  useEffect(() => {
-    
-  })
 
   return (
     <div>
       <MantineProvider withGlobalStyles withNormalizeCSS>
-        <Navbar />
-        <Text>Mantine!</Text>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="browser" element={<Browser />} />
+              <Route path="*" element={<NoPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
       </MantineProvider>
-      <Routes>
-        <Route index path="/" element={<Home />} />
-        <Route path="/map" element={<Map />} />
-        <Route path="items" element={<Browser />} />
-      </Routes>
     </div>
-
   );
 }

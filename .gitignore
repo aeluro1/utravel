@@ -26,5 +26,5 @@ yarn-error.log*
 __pycache__
 /.vscode
 /venv
-*/scraper/data/
-*/scraper/*.db
+# */scraper/data/
+# */scraper/*.db

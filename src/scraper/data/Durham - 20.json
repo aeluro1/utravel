@@ -1,0 +1,148 @@
+[
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d24156178-Reviews-Panera_Bread-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Panera Bread",
+        "address": "10 Duke Medicine Circle Room 1E30, Durham, NC 27710",
+        "phone": "+1 919-213-7059",
+        "id": "7689227868015280",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d24091959-Reviews-Death_By_Taco-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Death By Taco",
+        "address": "Durham, NC",
+        "phone": "+1 919-308-3844",
+        "id": "8098856387914213",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[\"Mexican\"]",
+        "price": null
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d13959616-Reviews-Papa_Johns_Pizza-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Papa Johns Pizza",
+        "address": "811 Broad Street, Durham, NC 27701-2027",
+        "phone": "+1 919-682-7272",
+        "id": "3388369070812779",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[\"Mid-range\", \"Pizza\", \"Fast Food\"]",
+        "price": "$$ - $$$"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d25523826-Reviews-Jimmy_John_s_Sandwiches-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Jimmy John's Sandwiches",
+        "address": "701 9th Street, Durham, NC 27705",
+        "phone": null,
+        "id": "3283111467074723",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d25523817-Reviews-Jimmy_John_s_Sandwiches-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Jimmy John's Sandwiches",
+        "address": "4215 University Drive, Durham, NC 27707",
+        "phone": null,
+        "id": "5276418667074723",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d25523801-Reviews-Jimmy_John_s_Sandwiches-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Jimmy John's Sandwiches",
+        "address": "1125 North Carolina 54, Durham, NC 27707",
+        "phone": null,
+        "id": "1031273367074723",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d19600056-Reviews-Chick_fil_A-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Chick-fil-A",
+        "address": "610 E Lawson St W.G Pearson Student Center, Durham, NC 27701",
+        "phone": "+1 919-530-6498",
+        "id": "602004571806166",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d20996949-Reviews-Del_Rancho_Mexican_Grill-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Del Rancho Mexican Grill",
+        "address": "730 9th St, Durham, NC 27705-4803",
+        "phone": null,
+        "id": "2395394914218764",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d15256560-Reviews-Nothing_Bundt_Cakes-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Nothing Bundt Cakes",
+        "address": "1125 W Nc Highway 54 Suite 501, Durham, NC 27707",
+        "phone": "+1 984-439-2277",
+        "id": "3463869356185405",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d25504459-Reviews-Captain_D_s_Seafood_Kitchen-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Captain D's Seafood Kitchen",
+        "address": "4300 North Roxboro Street, Durham, NC 27704",
+        "phone": null,
+        "id": "8508000150764574",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d25491560-Reviews-New_Partner_Placeholder_DO_NOT_EDIT-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "New Partner Placeholder [DO NOT EDIT",
+        "address": "1612 South Miami Boulevard, Durham, NC 27703",
+        "phone": null,
+        "id": "8306602554889344",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d10151626-Reviews-McDonald_s-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "McDonald's",
+        "address": "5277 N Roxboro Road, Durham, NC 27712",
+        "phone": "+1 919-471-9645",
+        "id": "4652672844927358",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[\"American\"]",
+        "price": null
+    },
+    {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g49092-d19975749-Reviews-Bralie_s_2_sports_bar_grill-Durham_North_Carolina.html",
+        "imgs": "[]",
+        "name": "Bralie's 2 sports bar & grill",
+        "address": "4707 Hillsborough Rd, Durham, NC 27705-2225",
+        "phone": "+1 919-294-9669",
+        "id": "1541811281890269",
+        "rating": -1,
+        "review_count": 0,
+        "tags": "[]"
+    }
+]

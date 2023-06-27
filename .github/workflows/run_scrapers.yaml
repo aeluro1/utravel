@@ -13,15 +13,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      # - name: Listing installed package
-      #   run: apt list --installed
       - name: Purging previous chromedriver installation
         run: sudo apt purge google-chrome-stable
       - name: Installing required packages
         run: pip install -r requirements.txt
-        # run: pip install chromedriver-autoinstaller selenium
       - name: Run scrapers
-        run: python src/scraper/scraper.py
+        run: python src/scraper/scraper_ta.py --csv test -n 10
       - name: Commit and push results
         run: |
           git config --global user.name "github-action[bot]"
@@ -29,6 +26,3 @@ jobs:
           git add .
           git commit -m "GitHub Action: Run Scrapers"
           git push
-
-
-      

@@ -11,6 +11,8 @@ import httpx
 import nest_asyncio
 from loguru import logger
 from fake_useragent import UserAgent
+from stem import Signal
+from stem.control import Controller
 
 from database import Restaurant, Session
 
@@ -22,13 +24,8 @@ MAX_RETRIES = 5
 
 
 class ScraperClient(httpx.AsyncClient):
-    def __init__(self, headers = {}):
-        super().__init__(
-            http2 = True,
-            timeout = httpx.Timeout(TIMEOUT),
-            limits = httpx.Limits(max_connections = MAX_CONNECTIONS)
-        )
-        self.headers = {
+    def __init__(self, headers: dict = {}, proxy: str = ""):
+        headers = {
             "Authority": "www.tripadvisor.com",
             "User-Agent": UserAgent().random,
             "Accept": "*/*",
@@ -37,8 +34,27 @@ class ScraperClient(httpx.AsyncClient):
             **headers
         }
         
+        proxies = None
+        if proxy == "tor":
+            proxies = "socks5://127.0.0.1:9050"
+        elif proxy == "http":
+            pass
+        
+        super().__init__(
+            headers = headers,
+            proxies = proxies,
+            http2 = True,
+            timeout = httpx.Timeout(TIMEOUT),
+            limits = httpx.Limits(max_connections = MAX_CONNECTIONS)
+        )
+        
     def reset(self):
         self.headers["User-Agent"] = UserAgent().random
+        with Controller.from_port(port = "9051") as controller:
+            controller.authenticate(password = "password")
+            controller.signal(Signal.NEWNYM) # type: ignore
+        # Need way to reset client here?
+        
 
 
 def wrap_except(err_msg: str = "Default exception") -> Callable:

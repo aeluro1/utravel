@@ -1,3 +1,7 @@
 export default function NoPage() {
-  return (null)
+  return (
+    <>
+      <p>Invalid page</p>
+    </>
+  )
 }

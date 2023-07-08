@@ -1,10 +1,15 @@
-import { Outlet, Link } from "react-router-dom"
+import { Outlet } from "react-router-dom"
+import { Container } from "@mantine/core"
+import Navbar from "components/Navbar"
+
 
 export default function Layout() {
   return (
     <div>
-      <p><Link to="/map">Map</Link></p>
-      <Outlet />
+      <Navbar />
+      <Container>
+        <Outlet />
+      </Container>
     </div>
   )
 }

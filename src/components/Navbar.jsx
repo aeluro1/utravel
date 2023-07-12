@@ -1,6 +1,6 @@
 // Template from Mantine docs
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   createStyles,
@@ -14,6 +14,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { links } from "./Links";
+import { setSavedItems } from "../contexts/savedItems"
 
 
 const HEADER_HEIGHT = rem(60);
@@ -92,6 +93,13 @@ export default function Navbar() {
   const loc = useLocation();
   const [active, setActive] = useState(loc.pathname);
   const { classes, cx } = useStyles();
+
+  useEffect(() => {
+    const savedItems = localStorage.getItem("savedItems");
+    if (savedItems) {
+      setSavedItems(JSON.parse(savedItems));
+    }
+  })
 
   const items = links.map((link) => (
     <Link

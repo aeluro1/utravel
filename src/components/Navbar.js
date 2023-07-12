@@ -1,7 +1,7 @@
 // Template from Mantine docs
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   createStyles,
   Header,
@@ -89,7 +89,8 @@ const useStyles = createStyles((theme) => ({
 
 export default function Navbar() {
   const [opened, handlers] = useDisclosure(false);
-  const [active, setActive] = useState(links[0].link);
+  const loc = useLocation();
+  const [active, setActive] = useState(loc.pathname);
   const { classes, cx } = useStyles();
 
   const items = links.map((link) => (
@@ -108,7 +109,7 @@ export default function Navbar() {
   ));
 
   return (
-    <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+    <Header height={HEADER_HEIGHT} className={classes.root}>
       <Container className={classes.header}>
         {/* <MantineLogo size={28} /> */}
         <Group spacing={5} className={classes.links}>

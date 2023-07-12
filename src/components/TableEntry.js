@@ -1,49 +1,84 @@
 import {
   Text,
   Group,
-  Image,
   Button,
   Paper,
-  rem,
   createStyles,
-  Flex
+  Divider
 } from "@mantine/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 
+
+const useStyles = createStyles((theme) => ({
+  card: {
+    display: "grid",
+    justifyContent: "center",
+    gap: "12px",
+    [theme.fn.largerThan("sm")]: {
+      height: "150px",
+      gridAutoFlow: "column",
+      // gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", // To prevent grid blowout if using fr units
+      gridTemplateColumns: "400px 200px",
+    },
+    [theme.fn.smallerThan("sm")]: {
+      width: "250px",
+      gridAutoFlow: "row",
+      gridTemplateRows: "150px 150px"
+    }
+  },
+  cardImageContainer: {
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+    minWidth: "0" // Prevents grid blowout
+  },
+  cardImage: {
+    objectFit: "cover",
+    width: "100%",
+    height: "100%",
+    borderRadius: "10%",
+  },
+  cardInfo: {
+    display: "flex",
+    flexFlow: "column nowrap",
+    minWidth: "0" // Prevents grid blowout
+  },
+  cardInfoBtns: {
+    marginTop: "auto"
+  }
+}))
 
 export default function TableEntry({ item }) {
-
-  // const useStyles = createStyles((theme) => ({
-  //   button: {
-  //     paddingLeft: rem(20),
-  //     paddingRight: rem(20)
-  //   }
-  // }))
-  
-  // switch (item.type) {
-  //   case "restaurant":
-
-  // }
+  const { classes, cx } = useStyles();
   return (
     <Paper shadow="xs" p="sm">
-      <Flex
-        justify="space-between"
-        align="center"
-        direction="row"
-        wrap="wrap"
-      >
-        <div>
-          <Text>{item.name}</Text>
-          <Text>{item.phone}</Text>
-          <Text>{item.address}</Text>
+      <div className={classes.card}>
+        <div className={classes.cardInfo}>
+          <Text fz="md" truncate>{item.name}</Text>
+          <Divider />
           <Group spacing="sm">
+            <Text fz="sm">
+              {[...Array(Math.floor(item.rating))].map(() => <FontAwesomeIcon icon={faStar} />)}
+              {[...Array(5 - Math.ceil(item.rating))].map(() => <FontAwesomeIcon icon={faStar} style={{visibility: "hidden"}} />)}
+              {item.rating % 1 === 0 ? null : <FontAwesomeIcon icon={faStarHalf} />}
+            </Text>
+            <Text fz="sm">
+              {`${item.review_count}`}
+            </Text>
+          </Group>
+          
+          <Text fz="sm" truncate>{item.phone}</Text>
+          <Text fz="sm" truncate>{item.address}</Text>
+          <Group spacing="sm" className={classes.cardInfoBtns}>
             <Button
+              compact
               leftIcon={<FontAwesomeIcon icon={faPlus} />}
             >
               Save
             </Button>
             <Button
+              compact
               component="a"
               href={item.url}
               target="_blank"
@@ -54,10 +89,10 @@ export default function TableEntry({ item }) {
             </Button>
           </Group>
         </div>
-        <div>
-          <Image width={200} height={100} mx="auto" radius="md" src={item.imgs[0]} alt={item.name} />
+        <div className={classes.cardImageContainer}>
+          <img className={classes.cardImage} src={item.imgs[0]} alt={item.name} />
         </div>
-      </Flex>
+      </div>
     </Paper>
   )
 }

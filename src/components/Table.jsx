@@ -15,6 +15,12 @@ export default function Table() {
   let items = temp.map((item) => ({ ...item, type: "restaurant"}))
 
   return (
+    // For some reason, the below causes the card component to fill the entire screen...
+    // <div style={{flexFlow: "row wrap", justifyContent: "flex-start", outline:"10px solid red"}}>
+    //   {items.map((item) => (
+    //     <TableEntry item={item} />
+    //   ))}
+    // </div>
     <Stack align="center" justify="flex-start">
       {items.map((item) => (
         <TableEntry item={item} />

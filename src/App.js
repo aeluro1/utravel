@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
-import Browser from "./pages/Browser";
+import Browser from "./pages/Browser.jsx";
 import Map from "./pages/Map";
 import NoPage from "./pages/NoPage";
 

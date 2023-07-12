@@ -19,7 +19,7 @@ const useStyles = createStyles((theme) => ({
       height: "150px",
       gridAutoFlow: "column",
       // gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", // To prevent grid blowout if using fr units
-      gridTemplateColumns: "400px 200px",
+      gridTemplateColumns: "400px 200px"
     },
     [theme.fn.smallerThan("sm")]: {
       width: "250px",

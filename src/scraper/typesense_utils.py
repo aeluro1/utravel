@@ -8,7 +8,7 @@ from dotenv import dotenv_values
 
 
 curr_path = Path(__file__).resolve().parent
-config = dotenv_values(curr_path / ".env")
+config = dotenv_values(curr_path / "ts_admin.env")
 client: typesense.Client = None # type: ignore
 
 

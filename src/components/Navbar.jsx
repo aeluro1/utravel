@@ -14,7 +14,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { links } from "./Links";
-import { setSavedItems } from "../contexts/savedItems"
+import { setSavedItems } from "../state/ItemManager"
 
 
 const HEADER_HEIGHT = rem(60);

@@ -23,23 +23,22 @@ const useStyles = createStyles((theme) => ({
     display: "grid",
     justifyContent: "center",
     gap: [theme.spacing.md],
+    gridAutoRows: "140px",
     [theme.fn.largerThan("xs")]: {
-      height: "140px",
-      gridAutoFlow: "row",
-      gridTemplateRows: "1fr",
-      // gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", // To prevent grid blowout if using fr units
-      gridTemplateColumns: "2fr 200px"
+      // gridAutoFlow: "row",
+      // gridTemplateRows: "140px",
+      gridTemplateColumns: "1fr 200px",
+      gridTemplateAreas: '"cardInfo cardImage"'
     },
     [theme.fn.smallerThan("xs")]: {
-      gridAutoFlow: "column",
-      gridTemplateRows: "150px 150px",
-      gridTemplateColumns: "1fr"
-    },
-    "> div": {
-      outline: "1px solid red"
+      // gridAutoFlow: "column",
+      // gridTemplateRows: "140px 160px",
+      gridTemplateColumns: "1fr",
+      gridTemplateAreas: '"cardInfo" "cardImage"'
     }
   },
   cardImageContainer: {
+    gridArea: "cardImage",
     width: "100%",
     height: "100%",
     overflow: "hidden",
@@ -55,6 +54,7 @@ const useStyles = createStyles((theme) => ({
     borderRadius: "10%",
   },
   cardInfo: {
+    gridArea: "cardInfo",
     display: "flex",
     flexFlow: "column nowrap",
     width: "100%",
@@ -67,7 +67,7 @@ const useStyles = createStyles((theme) => ({
 }))
 
 export default function TableEntry({ item }) {
-  const { classes, cx } = useStyles();
+  const { classes } = useStyles();
   return (
     <Paper className={classes.cardContainer} shadow="xs" p="sm">
       <div className={classes.card}>
@@ -84,7 +84,6 @@ export default function TableEntry({ item }) {
               {`${item.review_count}`}
             </Text>
           </Group>
-          
           <Text fz="sm" truncate>{item.phone}</Text>
           <Text fz="sm" truncate>{item.address}</Text>
           <Group spacing="sm" className={classes.cardInfoBtns}>

@@ -11,38 +11,55 @@ import { faEye, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-i
 
 
 const useStyles = createStyles((theme) => ({
+  cardContainer: {
+    [theme.fn.largerThan("xs")]: {
+      width: "min(600px, 80%)"
+    },
+    [theme.fn.smallerThan("xs")]: {
+      width: "80%"
+    }
+  },
   card: {
     display: "grid",
     justifyContent: "center",
-    gap: "12px",
-    [theme.fn.largerThan("sm")]: {
-      height: "150px",
-      gridAutoFlow: "column",
-      // gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", // To prevent grid blowout if using fr units
-      gridTemplateColumns: "400px 200px"
-    },
-    [theme.fn.smallerThan("sm")]: {
-      width: "250px",
+    gap: [theme.spacing.md],
+    [theme.fn.largerThan("xs")]: {
+      height: "140px",
       gridAutoFlow: "row",
-      gridTemplateRows: "150px 150px"
+      gridTemplateRows: "1fr",
+      // gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", // To prevent grid blowout if using fr units
+      gridTemplateColumns: "2fr 200px"
+    },
+    [theme.fn.smallerThan("xs")]: {
+      gridAutoFlow: "column",
+      gridTemplateRows: "150px 150px",
+      gridTemplateColumns: "1fr"
+    },
+    "> div": {
+      outline: "1px solid red"
     }
   },
   cardImageContainer: {
     width: "100%",
     height: "100%",
     overflow: "hidden",
-    minWidth: "0" // Prevents grid blowout
+    minWidth: "0", // Prevents grid blowout
+    // minHeight: "0",
+    textAlign: "center"
   },
   cardImage: {
     objectFit: "cover",
     width: "100%",
     height: "100%",
+    maxWidth: "250px",
     borderRadius: "10%",
   },
   cardInfo: {
     display: "flex",
     flexFlow: "column nowrap",
-    minWidth: "0" // Prevents grid blowout
+    width: "100%",
+    minWidth: "0", // Prevents grid blowout
+    // minHeight: "0"
   },
   cardInfoBtns: {
     marginTop: "auto"
@@ -52,7 +69,7 @@ const useStyles = createStyles((theme) => ({
 export default function TableEntry({ item }) {
   const { classes, cx } = useStyles();
   return (
-    <Paper shadow="xs" p="sm">
+    <Paper className={classes.cardContainer} shadow="xs" p="sm">
       <div className={classes.card}>
         <div className={classes.cardInfo}>
           <Text fz="md" truncate>{item.name}</Text>

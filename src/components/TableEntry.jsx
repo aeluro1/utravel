@@ -32,7 +32,7 @@ const useStyles = createStyles((theme) => ({
     },
     [theme.fn.smallerThan("xs")]: {
       // gridAutoFlow: "column",
-      // gridTemplateRows: "140px 160px",
+      // gridTemplateRows: "140px 160px", // Overrides auto row height if desired
       gridTemplateColumns: "1fr",
       gridTemplateAreas: '"cardInfo" "cardImage"'
     }

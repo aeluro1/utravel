@@ -1,9 +1,19 @@
 import axios from "axios";
-import { Stack } from "@mantine/core";
+import { Stack, createStyles } from "@mantine/core";
 import TableEntry from "./TableEntry";
 
 
+const useStyles = createStyles((theme) => ({
+  results: {
+    display: "grid",
+    gap: [theme.spacing.sm],
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(200px, 100%), 1fr))"
+
+  }
+}))
+
 export default function Table() {
+  const { classes } = useStyles();
 
   // let items = axios.get();
   // Temporary items for testing...

@@ -5,7 +5,6 @@ import { Link, useLocation } from "react-router-dom";
 import {
   createStyles,
   Header,
-  Container,
   Group,
   Burger,
   Paper,
@@ -23,6 +22,10 @@ const useStyles = createStyles((theme) => ({
   root: {
     position: 'fixed',
     zIndex: 1,
+    width: "100vw",
+    display: "flex",
+    justifyContent: "center",
+    // overflowX: "hidden"
   },
 
   dropdown: {
@@ -45,7 +48,7 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '100%',
+    width: "900px"
   },
 
   links: {
@@ -118,8 +121,7 @@ export default function Navbar() {
 
   return (
     <Header height={HEADER_HEIGHT} className={classes.root}>
-      <Container className={classes.header}>
-        {/* <MantineLogo size={28} /> */}
+      <div className={classes.header} size="md">
         <Group spacing="sm" className={classes.links}>
           {items}
         </Group>
@@ -133,7 +135,7 @@ export default function Navbar() {
             </Paper>
           )}
         </Transition>
-      </Container>
+      </div>
     </Header>
   );
 }

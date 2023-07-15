@@ -120,7 +120,7 @@ export default function Navbar() {
     <Header height={HEADER_HEIGHT} className={classes.root}>
       <Container className={classes.header}>
         {/* <MantineLogo size={28} /> */}
-        <Group spacing={5} className={classes.links}>
+        <Group spacing="sm" className={classes.links}>
           {items}
         </Group>
 

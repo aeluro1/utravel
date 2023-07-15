@@ -22,7 +22,7 @@ const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
     }]
   },
   additionalSearchParameters: {
-    query_by: "name"
+    query_by: "name,address"
   }
 });
 const searchClient = typesenseInstantSearchAdapter.searchClient;
@@ -40,7 +40,7 @@ const useStyles = createStyles((theme) => ({
       gridTemplateAreas: `"sidebar" "body"`
     },
     ">div": {
-      outline: "1px solid grey",
+      outline: `1px solid ${theme.colors.gray[4]}`,
     }
   },
   sidebar: {
@@ -110,7 +110,7 @@ export default function Browser() {
         </div>
         <div className={classes.body}>
           <div className={classes.searchbar}>
-            <SearchBox />
+            <SearchBox placeholder="Search restaurants (name, address)" />
           </div>
           <Hits />
           <Pagination siblings={1} boundaries={3} defaultValue={1} />

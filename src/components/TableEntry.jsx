@@ -13,8 +13,13 @@ import { faEye, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-i
 const useStyles = createStyles((theme) => ({
   cardContainer: {
     width: "100%",
-    maxWidth: "550px",
-    minWidth: "min-content"
+    minWidth: "min-content",
+    [theme.fn.largerThan("sm")]: {
+      maxWidth: "550px"
+    },
+    [theme.fn.smallerThan("sm")]: {
+      maxWidth: "350px"
+    }
   },
   card: {
     display: "grid",

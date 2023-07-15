@@ -16,8 +16,8 @@ export default function SearchBox(props) {
 
   return (
       <Input
-        placeholder="Search restaurants"
         onChange={(e) => search(e.target.value)}
+        { ...props }
       />
   )
 }

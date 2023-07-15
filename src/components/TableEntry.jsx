@@ -12,25 +12,22 @@ import { faEye, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-i
 
 const useStyles = createStyles((theme) => ({
   cardContainer: {
-    [theme.fn.largerThan("xs")]: {
-      width: "min(600px, 80%)"
-    },
-    [theme.fn.smallerThan("xs")]: {
-      width: "80%"
-    }
+    width: "100%",
+    maxWidth: "600px",
+    minWidth: "min-content"
   },
   card: {
     display: "grid",
     justifyContent: "center",
     gap: [theme.spacing.md],
-    gridAutoRows: "140px",
-    [theme.fn.largerThan("xs")]: {
+    gridAutoRows: "160px",
+    [theme.fn.largerThan("sm")]: {
       // gridAutoFlow: "row",
       // gridTemplateRows: "140px",
-      gridTemplateColumns: "1fr 200px",
+      gridTemplateColumns: "1fr 250px",
       gridTemplateAreas: '"cardInfo cardImage"'
     },
-    [theme.fn.smallerThan("xs")]: {
+    [theme.fn.smallerThan("sm")]: {
       // gridAutoFlow: "column",
       // gridTemplateRows: "140px 160px", // Overrides auto row height if desired
       gridTemplateColumns: "1fr",
@@ -86,6 +83,7 @@ export default function TableEntry({ item }) {
           </Group>
           <Text fz="sm" truncate>{item.phone}</Text>
           <Text fz="sm" truncate>{item.address}</Text>
+          <Text fz="sm" fs="italic" truncate>{item.tags.join(", ")}</Text>
           <Group spacing="sm" className={classes.cardInfoBtns}>
             <Button
               compact

@@ -13,8 +13,8 @@ import {
   rem,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { links } from "./Links";
-import { setSavedItems } from "../state/ItemManager"
+import { links } from "components/Links";
+import { setSavedItems } from "state/ItemManager"
 
 
 export const HEADER_HEIGHT = rem(60);

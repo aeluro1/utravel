@@ -1,9 +1,12 @@
-import Table from "components/Table";
-
+import { Paper, Text } from "@mantine/core";
 
 export default function Home() {
   return (
-    null
+    <div>
+      <Paper>
+        <Text>Nothing added yet.</Text>
+      </Paper>
+    </div>
   )
 }
 

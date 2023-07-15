@@ -15,7 +15,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={ <Layout /> }>
               <Route index element={ <Home /> } />
-              <Route path="browser" element={ <Browser /> } />
+              <Route path="browser/:page?" element={ <Browser /> } />
               <Route path="map" element={ <Map /> } />
               <Route path="*" element={ <NoPage /> } />
             </Route>

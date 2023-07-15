@@ -13,7 +13,7 @@ import { faEye, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-i
 const useStyles = createStyles((theme) => ({
   cardContainer: {
     width: "100%",
-    maxWidth: "600px",
+    maxWidth: "550px",
     minWidth: "min-content"
   },
   card: {
@@ -73,9 +73,9 @@ export default function TableEntry({ item }) {
           <Divider />
           <Group spacing="sm">
             <Text fz="sm">
-              {[...Array(Math.floor(item.rating))].map(() => <FontAwesomeIcon icon={faStar} />)}
-              {[...Array(5 - Math.ceil(item.rating))].map(() => <FontAwesomeIcon icon={faStar} style={{visibility: "hidden"}} />)}
+              {[...Array(Math.max(Math.floor(item.rating), 0))].map((_, idx) => <FontAwesomeIcon key={idx} icon={faStar} />)}
               {item.rating % 1 === 0 ? null : <FontAwesomeIcon icon={faStarHalf} />}
+              {[...Array(5 - Math.max(Math.ceil(item.rating), 0))].map((_, idx) => <FontAwesomeIcon key={idx} icon={faStar} style={{visibility: "hidden"}} />)}
             </Text>
             <Text fz="sm">
               {`${item.review_count}`}

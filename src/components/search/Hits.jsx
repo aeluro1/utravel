@@ -7,7 +7,7 @@ export default function Hits(props) {
   const { hits } = useHits(props);
   return (
     <Table>
-      {hits.map((h) => <TableEntry item={h} />)}
+      {hits.map((h) => <TableEntry key={h.id} item={h} />)}
     </Table>
   )
 }

@@ -3,6 +3,7 @@ import { createStyles } from "@mantine/core";
 
 const useStyles = createStyles((theme) => ({
   results: {
+    width: "100%",
     display: "grid",
     gap: [theme.spacing.sm],
     justifyItems: "center",

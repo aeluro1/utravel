@@ -5,7 +5,7 @@ import { useRefinementList } from "react-instantsearch-hooks-web";
 
 const useStyles = createStyles((theme) => ({
   root: {
-    height: "300px",
+    height: "min(min-content, 300px)",
     width: "100%"
   }
 }))
@@ -17,11 +17,9 @@ export default function RefinementList(props) {
     refine,
     searchForItems
   } = useRefinementList(props);
-  const [search, setSearch] = useState("");
   const [facets, setFacets] = useState([]);
 
   const updateSearch = (query) => {
-    setSearch(query);
     searchForItems(query);
   }
 
@@ -43,18 +41,17 @@ export default function RefinementList(props) {
     <div>
       <TextInput
         placeholder={props.searchablePlaceholder}
-        value={search}
         onChange={(e) => updateSearch(e.target.value)}
       />
       <ScrollArea h={props.h} className={classes.root} type="hover" offsetScrollbars>
         <Checkbox.Group onChange={updateRefinement}>
           {items.map((item) => (
             <Checkbox
+              key={item.value}
               value={item.label}
               label={`${item.label} (${item.count})`}
               size="xs"
               checked={item.isRefined}
-              truncate
             />
           ))}
         </Checkbox.Group>

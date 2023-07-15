@@ -4,14 +4,12 @@ import {
   createStyles
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import {
-  InstantSearch,
-  SearchBox
-} from "react-instantsearch-hooks-web";
+import { InstantSearch } from "react-instantsearch-hooks-web";
 import TypesenseInstantsearchAdapter from "typesense-instantsearch-adapter";
 import RefinementList from "components/search/RefinementList";
 import Hits from "components/search/Hits";
 import Pagination from "components/search/Pagination";
+import SearchBox from "components/search/SearchBox";
 
 
 const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
@@ -40,11 +38,15 @@ const useStyles = createStyles((theme) => ({
     [theme.fn.smallerThan("sm")]: {
       gridTemplateRows: "min-content 1fr",
       gridTemplateAreas: `"sidebar" "body"`
+    },
+    ">div": {
+      outline: "1px solid grey",
     }
   },
   sidebar: {
     gridArea: "sidebar",
     minWidth: "0",
+    paddingRight: [theme.spacing.sm]
   },
   filters: {
     [theme.fn.smallerThan("sm")]: {
@@ -55,18 +57,36 @@ const useStyles = createStyles((theme) => ({
     gridArea: "body",
     minWidth: "0",
     padding: [theme.spacing.lg],
-    display: "flex",
-    flexFlow: "column nowrap",
-    backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0]]
+    display: "grid",
+    justifyItems: "center",
+    gridAutoFlow: "column",
+    gridTemplateRows: "repeat(3, min-content)",
+    // gridAutoRows: "min-content", // Seems to make the grid fill in reverse direction
+    gap: `calc(1 * ${[theme.spacing.lg]})`,
+    backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0]],
   },
   refinementList: {
     height: "300px"
+  },
+  searchbar: {
+    width: "min(80%, 800px)"
   }
 }))
 
 export default function Browser() {
   const { classes } = useStyles();
   const [opened, { toggle }] = useDisclosure(true);
+
+  // // Dynamically collapse items upon window size change - WIP
+  // const theme = useMantineTheme();
+  // const { width } = useViewportSize();
+  // const minWidth = theme.breakpoints.sm;
+  // useEffect(() => {
+  //   if ((width < minWidth && opened) || (width > minWidth && !opened)) {
+  //     toggle();
+  //   }
+  // })
+
   return (
     <InstantSearch searchClient={searchClient} indexName="restaurants">
       <div className={classes.layout}>
@@ -89,9 +109,11 @@ export default function Browser() {
           </Collapse>
         </div>
         <div className={classes.body}>
-          <SearchBox />
+          <div className={classes.searchbar}>
+            <SearchBox />
+          </div>
           <Hits />
-          {/* <Pagination totalPages={10} padding={2} /> */}
+          <Pagination siblings={1} boundaries={3} defaultValue={1} />
         </div>
       </div>
     </InstantSearch>

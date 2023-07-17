@@ -3,5 +3,5 @@ export default function NoPage() {
     <>
       <p>Invalid page</p>
     </>
-  )
+  );
 }

@@ -9,5 +9,5 @@ export default function Hits(props) {
     <Table>
       {hits.map((h) => <TableEntry key={h.id} item={h} />)}
     </Table>
-  )
+  );
 }

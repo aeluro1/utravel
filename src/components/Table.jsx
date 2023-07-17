@@ -14,7 +14,7 @@ const useStyles = createStyles((theme) => ({
       gridTemplateColumns: "repeat(auto-fill, minmax(min(250px, 100%), 1fr))"
     },
   }
-}))
+}));
 
 export default function Table(props) {
   const { classes } = useStyles();
@@ -23,5 +23,5 @@ export default function Table(props) {
     <div className={classes.container}>
       {props.children}
     </div>
-  )
+  );
 }

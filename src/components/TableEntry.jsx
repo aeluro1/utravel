@@ -73,7 +73,7 @@ const useStyles = createStyles((theme) => ({
   actionBtn: {
     width: "90px"
   }
-}))
+}));
 
 export default function TableEntry({ item }) {
   const { classes } = useStyles();
@@ -139,5 +139,5 @@ export default function TableEntry({ item }) {
         </div>
       </div>
     </Paper>
-  )
+  );
 }

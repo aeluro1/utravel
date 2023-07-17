@@ -1,3 +1,5 @@
+import GoogleMaps from "components/GoogleMaps";
+
 export default function Map() {
-  return null;
+  return <GoogleMaps />;
 }

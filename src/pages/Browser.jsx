@@ -1,7 +1,8 @@
 import {
   Button,
   Collapse,
-  createStyles
+  createStyles,
+  useMantineTheme
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { InstantSearch } from "react-instantsearch-hooks-web";
@@ -10,6 +11,7 @@ import RefinementList from "components/search/RefinementList";
 import Hits from "components/search/Hits";
 import Pagination from "components/search/Pagination";
 import SearchBox from "components/search/SearchBox";
+import { useEffect, useState } from "react";
 
 
 const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
@@ -52,7 +54,7 @@ const useStyles = createStyles((theme) => ({
   filters: {
     [theme.fn.smallerThan("sm")]: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(min(200px, 100%), 1fr))",
+      gridTemplateColumns: "repeat(auto-fill, minmax(min(180px, 100%), 1fr))",
       gap: [theme.spacing.lg]
     }
   },
@@ -73,21 +75,28 @@ const useStyles = createStyles((theme) => ({
   searchbar: {
     width: "min(80%, 800px)"
   }
-}))
+}));
 
 export default function Browser() {
   const { classes } = useStyles();
   const [opened, { toggle }] = useDisclosure(true);
-  
+
   // // Dynamically collapse items upon window size change - WIP
-  // const theme = useMantineTheme();
-  // const { width } = useViewportSize();
-  // const minWidth = theme.breakpoints.sm;
+  // const breakpoint = useMantineTheme().fn.smallerThan("sm").split("@media ")[1];
   // useEffect(() => {
-  //   if ((width < minWidth && opened) || (width > minWidth && !opened)) {
-  //     toggle();
+  //   const mediaQuery = window.matchMedia(breakpoint);
+  //   const handler = () => {
+  //     console.log("triggered HERE");
+  //     console.log(mediaQuery.matches);
+  //     // const mediaQuery = window.matchMedia(breakpoint);
+  //     if ((mediaQuery.matches && opened) || (!mediaQuery.matches && !opened)) {
+  //       console.log("toggle");
+  //       toggle();
+  //     }
   //   }
-  // })
+  //   mediaQuery.addEventListener("change", handler);
+  //   // return () => mediaQuery.removeEventListener("change", handler);
+  // }, []);
 
   return (
     <InstantSearch searchClient={searchClient} indexName="restaurants">
@@ -129,5 +138,5 @@ export default function Browser() {
         </div>
       </div>
     </InstantSearch>
-  )
+  );
 }

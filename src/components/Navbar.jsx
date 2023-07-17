@@ -86,7 +86,7 @@ const useStyles = createStyles((theme) => ({
       backgroundColor: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).background,
       color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
     },
-  },
+  }
 }));
 
 export default function Navbar() {
@@ -97,7 +97,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setActive(loc.pathname)
-  }, [loc])
+  }, [loc]);
 
   const items = links.map((link) => (
     <Link

@@ -9,7 +9,7 @@ export default function SavedItemsProvider(props) {
 
   useEffect(() => {
     localStorage.setItem("savedItems", JSON.stringify(savedItems));
-  }, [savedItems])
+  }, [savedItems]);
 
   const addItem = useCallback((item) => {
     setSavedItems([...savedItems, item]);
@@ -17,7 +17,7 @@ export default function SavedItemsProvider(props) {
 
   const delItem = useCallback((id) => {
     setSavedItems(savedItems.filter((item) => (item.id !== id)));
-  }, [savedItems])
+  }, [savedItems]);
 
   const contextValue = useMemo(() => ({
     savedItems,
@@ -29,5 +29,5 @@ export default function SavedItemsProvider(props) {
     <savedItemsContext.Provider value={contextValue}>
       {props.children}
     </savedItemsContext.Provider>
-  )
+  );
 }

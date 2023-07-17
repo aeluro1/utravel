@@ -12,7 +12,7 @@ const useStyles = createStyles((theme) => ({
   searchBox: {
     marginBottom: [theme.spacing.xs]
   }
-}))
+}));
 
 export default function RefinementList(props) {
   const { classes } = useStyles();
@@ -25,7 +25,7 @@ export default function RefinementList(props) {
 
   const updateSearch = (query) => {
     searchForItems(query);
-  }
+  };
 
   const updateRefinement = (newFacets) => {
     if (newFacets.length > facets.length) {
@@ -39,7 +39,7 @@ export default function RefinementList(props) {
     }
     updateSearch("");
     setFacets(newFacets);
-  }
+  };
 
   let checkbox = (
     <Checkbox.Group onChange={updateRefinement}>
@@ -53,14 +53,14 @@ export default function RefinementList(props) {
         />
       ))}
     </Checkbox.Group>
-  )
+  );
   
   if (props.scrollable) {
     checkbox = (
       <ScrollArea h={props.h} type="hover" offsetScrollbars>
         {checkbox}
       </ScrollArea>
-    )
+    );
   }
 
   return (
@@ -77,5 +77,5 @@ export default function RefinementList(props) {
       {checkbox}
       <Divider my="md" />
     </div>
-  )
+  );
 }

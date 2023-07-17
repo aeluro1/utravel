@@ -24,7 +24,7 @@ const useStyles = createStyles((theme) => ({
     alignItems: "center",
     gap: [theme.spacing.lg]
   }
-}))
+}));
 
 export default function Home() {
   const { savedItems } = useContext(savedItemsContext);
@@ -42,6 +42,6 @@ export default function Home() {
         </Table>
       )}
     </div>
-  )
+  );
 }
 

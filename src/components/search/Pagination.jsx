@@ -19,5 +19,5 @@ export default function SearchPagination(props) {
       total={nbPages}
       {...props}
     />
-  )
+  );
 }

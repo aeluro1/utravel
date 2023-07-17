@@ -11,4 +11,4 @@ export const links = [
     link: "/map",
     label: "map"
   }
-]
+];

@@ -1,6 +1,6 @@
-import { Outlet } from "react-router-dom"
-import { createStyles } from "@mantine/core"
-import Navbar, { HEADER_HEIGHT } from "components/Navbar"
+import { Outlet } from "react-router-dom";
+import { createStyles } from "@mantine/core";
+import Navbar, { HEADER_HEIGHT } from "components/Navbar";
 
 
 const useStyles = createStyles((theme) => ({
@@ -10,7 +10,7 @@ const useStyles = createStyles((theme) => ({
     height: "100%",
     backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0]]
   }
-}))
+}));
 
 export default function Layout() {
   const { classes } = useStyles();
@@ -21,5 +21,5 @@ export default function Layout() {
         <Outlet />
       </div>
     </>
-  )
+  );
 }

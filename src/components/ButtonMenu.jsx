@@ -7,5 +7,5 @@ export default function ButtonMenu() {
       transitionProps={{ transition: "pop-top-right" }}
       position="bottom-end"
     ></Menu>
-  )
+  );
 }

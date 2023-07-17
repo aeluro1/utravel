@@ -43,7 +43,7 @@ def to_jsonl():
                     continue
                 for d in data:
                     try:
-                        d["price"] = "N/A" if d["price"] == "" or None else d["price"]
+                        d["price"] = "N/A" if d["price"] == "" or d["price"] is None else d["price"]
                         d["imgs"] = json.loads(d["imgs"])
                         d["tags"] = json.loads(d["tags"])
                     except Exception:
@@ -87,10 +87,14 @@ def get_collections():
     pprint(client.collections.retrieve())
 
 
+def del_collection(name: str):
+    client.collections[name].delete() # type: ignore
+
+
 def search_docs(query: str,
                 query_by: str = "",
-                sort_by: str = "",
-                filter_by: str = ""):
+                filter_by: str = "",
+                sort_by: str = ""):
     params = {
         "q": query,
         "query_by": query_by if query_by != "" else "name",
@@ -107,12 +111,14 @@ def search_docs(query: str,
 def main(args: argparse.Namespace):
     if args.jsonl:
         to_jsonl()
-    if args.push or args.get or args.search:
+    if args.push or args.get or args.delete or args.search:
         init_client()
     if args.push:
         push_docs(args.push)
     if args.get:
         get_collections()
+    if args.delete:
+        del_collection(args.delete)
     if args.search:
         search_args = args.search.split(";")
         search_docs(*search_args)
@@ -134,6 +140,11 @@ if __name__ == "__main__":
         "--get", "-g",
         action = "store_true",
         help = "print all collections in typesense server"
+    )
+    parser.add_argument(
+        "--delete", "-d",
+        action = "store",
+        help = "delete a collection"
     )
     parser.add_argument(
         "--search", "-s",

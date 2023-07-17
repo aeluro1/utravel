@@ -53,7 +53,9 @@ const useStyles = createStyles((theme) => ({
   },
   filters: {
     [theme.fn.smallerThan("sm")]: {
-      display: "flex"
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(min(200px, 100%), 1fr))",
+      gap: [theme.spacing.lg]
     }
   },
   body: {
@@ -99,15 +101,25 @@ export default function Browser() {
             compact>
             {`${opened ? "Hide" : "Show"} filters`}
           </Button>
-          <Collapse in={opened} className={classes.filters}>
-            <RefinementList
-              attribute="tags"
-              operator="and"
-              searchable={true}
-              searchablePlaceholder="Search tags"
-              limit={20}
-              h={300}
-            />
+          <Collapse in={opened}>
+            <div className={classes.filters}>
+              <RefinementList
+                attribute="tags"
+                operator="and"
+                searchable
+                searchablePlaceholder="Search tags"
+                scrollable
+                limit={20}
+                h={250}
+              />
+              {/* <RefinementList
+                attribute="price"
+                operator="and"
+                searchablePlaceholder="Filter price"
+                limit={5}
+                h={60}
+              /> */}
+            </div>
           </Collapse>
         </div>
         <div className={classes.body}>

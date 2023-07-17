@@ -16,6 +16,7 @@ const useStyles = createStyles((theme) => ({
   cardContainer: {
     width: "100%",
     minWidth: "200px",
+    height: "min-content",
     [theme.fn.largerThan("sm")]: {
       maxWidth: "550px"
     },
@@ -68,10 +69,9 @@ const useStyles = createStyles((theme) => ({
   cardInfoBtns: {
     marginTop: "auto",
     flexWrap: "nowrap"
-
   },
   actionBtn: {
-    width: "80px"
+    width: "90px"
   }
 }))
 
@@ -121,6 +121,7 @@ export default function TableEntry({ item }) {
               </Button>
             )}
             <Button
+              className={classes.actionBtn}
               component="a"
               href={item.url}
               target="_blank"

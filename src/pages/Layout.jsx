@@ -7,7 +7,7 @@ const useStyles = createStyles((theme) => ({
   layout: {
     paddingTop: HEADER_HEIGHT,
     minHeight: "100vh",
-    height: "100%",
+    height: "100vh",
     backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0]]
   }
 }));

@@ -40,13 +40,16 @@ const useStyles = createStyles((theme) => ({
       gridTemplateAreas: `"sidebar" "body"`
     },
     ">div": {
-      outline: `1px solid ${theme.colors.gray[4]}`,
+      outline: `1px solid ${theme.colors.gray[2]}`,
     }
   },
   sidebar: {
     gridArea: "sidebar",
     minWidth: "0",
-    paddingRight: [theme.spacing.sm]
+    backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white],
+    [theme.fn.largerThan("sm")]: {
+      padding: `0 ${[theme.spacing.sm]}`
+    }
   },
   filters: {
     [theme.fn.smallerThan("sm")]: {
@@ -62,8 +65,7 @@ const useStyles = createStyles((theme) => ({
     gridAutoFlow: "column",
     gridTemplateRows: "repeat(3, min-content)",
     // gridAutoRows: "min-content", // Seems to make the grid fill in reverse direction
-    gap: `calc(1 * ${[theme.spacing.lg]})`,
-    backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0]],
+    gap: `calc(1 * ${[theme.spacing.lg]})`
   },
   refinementList: {
     height: "300px"
@@ -76,7 +78,7 @@ const useStyles = createStyles((theme) => ({
 export default function Browser() {
   const { classes } = useStyles();
   const [opened, { toggle }] = useDisclosure(true);
-
+  
   // // Dynamically collapse items upon window size change - WIP
   // const theme = useMantineTheme();
   // const { width } = useViewportSize();
@@ -110,7 +112,7 @@ export default function Browser() {
         </div>
         <div className={classes.body}>
           <div className={classes.searchbar}>
-            <SearchBox placeholder="Search restaurants (name, address)" />
+            <SearchBox placeholder="Search restaurants by name or location" />
           </div>
           <Hits />
           <Pagination siblings={1} boundaries={3} defaultValue={1} />

@@ -4,11 +4,11 @@ export const links = [
     label: "home"
   },
   {
-    link: "/map",
-    label: "map"
-  },
-  {
     link: "/browser",
     label: "browser"
+  },
+  {
+    link: "/map",
+    label: "map"
   }
 ]

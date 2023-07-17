@@ -7,13 +7,15 @@ import {
   Divider
 } from "@mantine/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faMinus, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
+import { useContext } from "react";
+import { savedItemsContext } from "contexts/SavedItemsContext";
 
 
 const useStyles = createStyles((theme) => ({
   cardContainer: {
     width: "100%",
-    minWidth: "min-content",
+    minWidth: "200px",
     [theme.fn.largerThan("sm")]: {
       maxWidth: "550px"
     },
@@ -64,12 +66,19 @@ const useStyles = createStyles((theme) => ({
     // minHeight: "0"
   },
   cardInfoBtns: {
-    marginTop: "auto"
+    marginTop: "auto",
+    flexWrap: "nowrap"
+
+  },
+  actionBtn: {
+    width: "80px"
   }
 }))
 
 export default function TableEntry({ item }) {
   const { classes } = useStyles();
+  const { savedItems, addItem, delItem } = useContext(savedItemsContext);
+
   return (
     <Paper className={classes.cardContainer} shadow="xs" p="sm">
       <div className={classes.card}>
@@ -90,19 +99,35 @@ export default function TableEntry({ item }) {
           <Text fz="sm" truncate>{item.address}</Text>
           <Text fz="sm" fs="italic" truncate>{item.tags.join(", ")}</Text>
           <Group spacing="sm" className={classes.cardInfoBtns}>
+            {savedItems.some((i) => (i.id === item.id)) ? (
+              <Button
+                className={classes.actionBtn}
+                compact
+                leftIcon={<FontAwesomeIcon icon={faMinus} />}
+                color="red"
+                onClick={() => delItem(item.id)}
+              >
+                Delete
+              </Button>
+            ) : (
+              <Button
+                className={classes.actionBtn}
+                compact
+                leftIcon={<FontAwesomeIcon icon={faPlus} />}
+                color="green"
+                onClick={() => addItem(item)}
+              >
+                Save
+              </Button>
+            )}
             <Button
-              compact
-              leftIcon={<FontAwesomeIcon icon={faPlus} />}
-            >
-              Save
-            </Button>
-            <Button
-              compact
               component="a"
               href={item.url}
               target="_blank"
               rel="noreferrer noopener"
+              compact
               leftIcon={<FontAwesomeIcon icon={faEye} />}
+              variant="light"
             >
               View
             </Button>

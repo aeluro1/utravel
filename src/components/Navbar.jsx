@@ -13,7 +13,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { links } from "components/Links";
-import { setSavedItems } from "state/ItemManager"
 
 
 export const HEADER_HEIGHT = rem(60);
@@ -98,11 +97,8 @@ export default function Navbar() {
   const { classes, cx } = useStyles();
 
   useEffect(() => {
-    const savedItems = localStorage.getItem("savedItems");
-    if (savedItems) {
-      setSavedItems(JSON.parse(savedItems));
-    }
-  })
+    setActive(loc.pathname)
+  }, [loc])
 
   const items = links.map((link) => (
     <Link

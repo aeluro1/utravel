@@ -4,6 +4,7 @@ from pathlib import Path
 from pprint import pprint
 
 import typesense
+from typesense.exceptions import ObjectAlreadyExists
 from dotenv import dotenv_values
 
 
@@ -70,11 +71,19 @@ def push_docs(fn: str):
         "default_sorting_field": "review_count"
     }
 
-    client.collections.create(rst_schema)
+    try:
+        client.collections.create(rst_schema)
+    except ObjectAlreadyExists:
+        pass
+        
 
     jsonl_path = curr_path / "data" / f"{fn}.jsonl"
     with open(jsonl_path) as jsonl_file:
         client.collections["restaurants"].documents.import_(jsonl_file.read().encode("utf-8")) # type: ignore
+
+
+def get_collections():
+    pprint(client.collections.retrieve())
 
 
 def search_docs(query: str,
@@ -97,11 +106,13 @@ def search_docs(query: str,
 def main(args: argparse.Namespace):
     if args.jsonl:
         to_jsonl()
+    if args.push or args.get or args.search:
+        init_client()
     if args.push:
-        init_client()
         push_docs(args.push)
+    if args.get:
+        get_collections()
     if args.search:
-        init_client()
         search_args = args.search.split(";")
         search_docs(*search_args)
     
@@ -119,10 +130,16 @@ if __name__ == "__main__":
         help = "push documents in [file].jsonl to typesense server"
     )
     parser.add_argument(
+        "--get", "-g",
+        action = "store_true",
+        help = "print all collections in typesense server"
+    )
+    parser.add_argument(
         "--search", "-s",
         action = "store",
         help = "search documents with format string '[query];[query by];[filter by];[sort by]'"
     )
     args = parser.parse_args()
-    
+    if not any(vars(args).values()):
+        parser.error("No arguments provided")
     main(args)

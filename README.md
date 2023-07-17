@@ -7,6 +7,7 @@ UTravel is a website that simplifies trip planning by consolidating points of in
 # Features / To-Do
 - [ ] Utilize Google Maps API to facilitate point plotting
 - [ ] Integrate Google Calendar scheduling capabilities
-- [ ] Implement Typesense for instant, dynamic item searching
-- [ ] Implement ReactJS context saving for temporary data storage
+- [ ] Implement accounts using Google OAuth and MongoDB
+- [x] Implement Typesense for instant, dynamic item searching
+- [x] Implement ReactJS context saving for temporary data storage
 - [x] Write scraper to accumulate data from various platforms

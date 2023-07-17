@@ -10,6 +10,7 @@ import {
   Paper,
   Transition,
   rem,
+  Container,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { links } from "components/Links";
@@ -22,8 +23,6 @@ const useStyles = createStyles((theme) => ({
     position: 'fixed',
     zIndex: 1,
     width: "100vw",
-    display: "flex",
-    justifyContent: "center",
     // overflowX: "hidden"
   },
 
@@ -44,10 +43,10 @@ const useStyles = createStyles((theme) => ({
   },
 
   header: {
+    height: "100%",
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    width: "900px"
+    alignItems: 'center'
   },
 
   links: {
@@ -117,7 +116,7 @@ export default function Navbar() {
 
   return (
     <Header height={HEADER_HEIGHT} className={classes.root}>
-      <div className={classes.header} size="md">
+      <Container className={classes.header}>
         <Group spacing="sm" className={classes.links}>
           {items}
         </Group>
@@ -131,7 +130,7 @@ export default function Navbar() {
             </Paper>
           )}
         </Transition>
-      </div>
+      </Container>
     </Header>
   );
 }

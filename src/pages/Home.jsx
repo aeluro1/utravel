@@ -32,8 +32,8 @@ export default function Home() {
   return (
     <div className={classes.container}>
       {savedItems.length === 0 ? (
-        <Paper className={classes.paper} shadow="md" withBorder>
-          <Text>No items saved. Head over and find some attractions!</Text>
+        <Paper className={classes.paper} p="lg" shadow="md" withBorder>
+          <Text ta="center">No items saved. Head over and find some attractions!</Text>
           <Link to="/browser"><Button>Browser</Button></Link>
         </Paper>
       ) : (

@@ -47,9 +47,7 @@ const useStyles = createStyles((theme) => ({
     gridArea: "sidebar",
     minWidth: "0",
     backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white],
-    [theme.fn.largerThan("sm")]: {
-      padding: `0 ${[theme.spacing.sm]}`
-    }
+    padding: `0 ${[theme.spacing.sm]}`
   },
   filters: {
     [theme.fn.smallerThan("sm")]: {
@@ -109,8 +107,8 @@ export default function Browser() {
                 searchable
                 searchablePlaceholder="Search tags"
                 scrollable
-                limit={20}
-                h={250}
+                limit={30}
+                h={280}
               />
               {/* <RefinementList
                 attribute="price"

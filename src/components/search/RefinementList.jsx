@@ -7,8 +7,10 @@ const useStyles = createStyles((theme) => ({
   root: {
     width: "100%",
     display: "flex",
-    flexFlow: "column nowrap",
-    gap: [theme.spacing.sm]
+    flexFlow: "column nowrap"
+  },
+  searchBox: {
+    marginBottom: [theme.spacing.xs]
   }
 }))
 
@@ -65,6 +67,7 @@ export default function RefinementList(props) {
     <div className={classes.root}>
       {props.searchable ? (
         <TextInput
+          className={classes.searchBox}
           placeholder={props.searchablePlaceholder}
           onChange={(e) => updateSearch(e.target.value)}
         />

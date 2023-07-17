@@ -43,6 +43,7 @@ def to_jsonl():
                     continue
                 for d in data:
                     try:
+                        d["price"] = "N/A" if d["price"] == "" or None else d["price"]
                         d["imgs"] = json.loads(d["imgs"])
                         d["tags"] = json.loads(d["tags"])
                     except Exception:

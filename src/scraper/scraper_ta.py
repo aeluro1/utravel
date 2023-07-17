@@ -225,7 +225,8 @@ async def scrape_rst_page(client: ScraperClient, rst: Restaurant) -> Restaurant:
         rst.review_count = data_rst["reviewSummary"]["count"]
         # rst.imgs
         rst.tags = json.dumps([tag["tag"]["localizedName"] for tag in data_rst["topTags"]])
-        rst.price = data_rst["topTags"][0]["secondary_name"]
+        temp_price = data_rst["topTags"][0]["secondary_name"]
+        rst.price = temp_price if temp_price is not None else ""
     except Exception:
         pass
 

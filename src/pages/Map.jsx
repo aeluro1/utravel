@@ -9,8 +9,7 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     flexFlow: "column nowrap",
     justifyContent: "center",
-    alignItems: "center",
-    background: "red"
+    alignItems: "center"
   }
 }));
 

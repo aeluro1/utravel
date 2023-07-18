@@ -17,7 +17,7 @@ const useStyles = createStyles((theme) => ({
   paper: {
     width: "min(600px, 80%)",
     height: "300px",
-    margin: "auto",
+    margin: "0 auto",
     display: "flex",
     flexFlow: "column nowrap",
     justifyContent: "center",

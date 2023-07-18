@@ -1,5 +1,5 @@
 import { Carousel } from "@mantine/carousel";
-import { createStyles } from "@mantine/core";
+import { Image, createStyles } from "@mantine/core";
 
 
 const useStyles = createStyles((theme) => ({
@@ -21,11 +21,15 @@ export default function ImageCarousel({ urls, alt }) {
 
   return (
     <div className={classes.container}>
-      <Carousel withIndicators height="100%" sx={{ flex: 1 }}>
-        {urls.map((url) => (
-          <Carousel.Slide key={url}><img className={classes.cardImage} src={url} alt={alt} /></Carousel.Slide>
-        ))}
-      </Carousel>
+      {urls.length === 0 ? (
+        <Image width="100%" height="100%" sx={{ margin: "auto" }} withPlaceholder />
+      ) : (
+        <Carousel withIndicators height="100%" sx={{ flex: 1 }}>
+          {urls.map((url) => (
+            <Carousel.Slide key={url}><img className={classes.cardImage} src={url} alt={alt} /></Carousel.Slide>
+          ))}
+        </Carousel>
+      )}
     </div>
   );
 }

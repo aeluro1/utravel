@@ -40,16 +40,14 @@ const useStyles = createStyles((theme) => ({
     [theme.fn.smallerThan("sm")]: {
       gridTemplateRows: "min-content 1fr",
       gridTemplateAreas: `"sidebar" "body"`
-    },
-    ">div": {
-      outline: `1px solid ${theme.colors.gray[2]}`,
     }
   },
   sidebar: {
     gridArea: "sidebar",
     minWidth: "0",
     backgroundColor: [theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white],
-    padding: `0 ${[theme.spacing.sm]}`
+    padding: `0 ${[theme.spacing.sm]}`,
+    outline: `1px solid ${theme.colors.gray[2]}`
   },
   filters: {
     [theme.fn.smallerThan("sm")]: {

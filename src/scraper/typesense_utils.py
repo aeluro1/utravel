@@ -28,6 +28,16 @@ def init_client():
     })
 
 
+def clean(data: dict):
+    try:
+        if data["price"] == "" or data["price"] is None:
+            data["price"] = "N/A"
+        data["imgs"] = list(set(json.loads(data["imgs"])))
+        data["tags"] = json.loads(data["tags"])
+    except Exception:
+        pass
+
+
 def to_jsonl():
     path = curr_path / "data"
     if not path.is_dir():
@@ -42,12 +52,7 @@ def to_jsonl():
                 except json.JSONDecodeError:
                     continue
                 for d in data:
-                    try:
-                        d["price"] = "N/A" if d["price"] == "" or d["price"] is None else d["price"]
-                        d["imgs"] = json.loads(d["imgs"])
-                        d["tags"] = json.loads(d["tags"])
-                    except Exception:
-                        pass
+                    clean(d)
                     f.write(json.dumps(d))
                     f.write("\n")
         # f.flush()

@@ -183,6 +183,7 @@ def parse_search_page(tree: etree._Element) -> list[Restaurant]:
         imgs = elem.xpath(".//div[contains(@style, 'background-image')]/@style")
         r = re.compile(r"url\(\"(.*?)\"\)")
         imgs = [re.findall(r, img)[0] for img in imgs]
+        imgs = list(set(imgs))
         item.imgs = json.dumps(imgs)
         
         items.append(item)

@@ -6,7 +6,9 @@ const useStyles = createStyles((theme) => ({
   container: {
     height: "100%",
     width: "100%",
-    display: "flex"
+    display: "flex",
+    borderRadius: [theme.radius.md],
+    overflow: "hidden"
   },
   cardImage: {
     objectFit: "cover",

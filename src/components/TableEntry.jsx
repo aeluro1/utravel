@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faMinus, faPlus, faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
 import { savedItemsContext } from "contexts/SavedItemsContext";
+import ImageCarousel from "./ImageCarousel";
 
 
 const useStyles = createStyles((theme) => ({
@@ -48,7 +49,6 @@ const useStyles = createStyles((theme) => ({
     height: "100%",
     overflow: "hidden",
     minWidth: "0", // Prevents grid blowout
-    // minHeight: "0",
     textAlign: "center"
   },
   cardImage: {
@@ -64,7 +64,6 @@ const useStyles = createStyles((theme) => ({
     flexFlow: "column nowrap",
     width: "100%",
     minWidth: "0", // Prevents grid blowout
-    // minHeight: "0"
   },
   cardInfoBtns: {
     marginTop: "auto",
@@ -135,7 +134,8 @@ export default function TableEntry({ item }) {
           </Group>
         </div>
         <div className={classes.cardImageContainer}>
-          <img className={classes.cardImage} src={item.imgs[0]} alt={item.name} />
+          <ImageCarousel urls={item.imgs} alt={item.name} />
+          {/* <img className={classes.cardImage} src={item.imgs[0]} alt={item.name} /> */}
         </div>
       </div>
     </Paper>

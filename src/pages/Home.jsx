@@ -29,6 +29,7 @@ const useStyles = createStyles((theme) => ({
 export default function Home() {
   const { savedItems } = useContext(savedItemsContext);
   const { classes } = useStyles();
+
   return (
     <div className={classes.container}>
       {savedItems.length === 0 ? (
